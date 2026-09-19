@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["C:/Users/plaqu/OneDrive/Área de Trabalho/PROJETO CAPTURA DE LEADS 02/apps/landing/src/*"]
+      "@/*": ["./apps/landing/src/*"]
     }
   }
 }

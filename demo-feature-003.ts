@@ -1,4 +1,4 @@
-import { pathToFileURL } from "node:url"
+import { fileURLToPath, pathToFileURL } from "node:url"
 
 // Nota técnica: `AIGateway.ts` importa `SupabaseAIProvider.ts`, que usa
 // `import.meta.env` (só existe dentro do navegador/Vite) — por isso, rodando
@@ -8,7 +8,8 @@ import { pathToFileURL } from "node:url"
 // `composeResponse`) e reproduz exatamente a mesma lógica de decisão dele —
 // só o "telefonema pra Anthropic" em si é substituído por uma função local,
 // já que isso depende do navegador/Edge Function.
-const BASE = "C:/Users/plaqu/OneDrive/Área de Trabalho/PROJETO CAPTURA DE LEADS 02/apps/landing/src/orchestrator"
+// Relativo à localização deste arquivo: não depende de onde a pasta do projeto está.
+const BASE = fileURLToPath(new URL("./apps/landing/src/orchestrator", import.meta.url))
 
 function linha() {
   console.log("─".repeat(70))
