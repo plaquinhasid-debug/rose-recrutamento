@@ -157,16 +157,16 @@ Programa de indicação: uma Embaixadora convidada indica candidatas pelo link p
 | **E3.2** | Admin: botão **"Confirmar entrega"** → cria a recompensa `disponivel` (a pagar). Bloqueia candidata não aprovada/desistente, data futura ou anterior à indicação; UNIQUE impede duplicidade (409) | `confirm-primeiro-mostruario` |
 | **E3.3** | Admin: **"Marcar como paga"** (data do Pix) ou **"Cancelar"** (motivo obrigatório). Só a partir de `disponivel`; pago/cancelada são finais; UPDATE com `status='disponivel'` evita corrida | `update-recompensa-status` |
 | **E3.4** | Portal: totais **"A receber" / "Já recebido"** e o prêmio de cada indicação. Cancelada e motivo **nunca** aparecem para a Embaixadora | `get-my-indicacoes` (atualizada) |
+| **E3.5** | Admin: botão **"Invalidar"** (coluna Ações, motivo obrigatório). Nunca apaga; some do Portal; bloqueado se houver R$ 40 a pagar (cancelar antes) ou pago | `invalidate-indicacao` |
 
-Commits das E3.x: `3b35e1e` (E3.1), `66c9883` (E3.2), `7f8bafe` (E3.3), `17afc2a` (E3.4), `e755f2b` (ajuste visual do Portal). Todos publicados e conferidos em 2026-09-26. Testes: 1068/1068 passando (`node --import ./tests/register-ts-loader.mjs --test tests/*.test.mjs`).
+Commits das E3.x: `3b35e1e` (E3.1), `66c9883` (E3.2), `7f8bafe` (E3.3), `17afc2a` (E3.4), `e755f2b` (ajuste visual do Portal), `8119e58` (E3.5). Todos publicados e conferidos em 2026-09-26. Testes: 1091/1091 passando (`node --import ./tests/register-ts-loader.mjs --test tests/*.test.mjs`).
 
 ### Estado dos dados em produção (2026-09-26)
 - 1 Embaixadora ativa (Carol, código `7E9NH4VD`).
-- 2 indicações, **ambas de TESTE** ("TESTE E28 INDICACAO CAROL" — aprovada; "TESTE E28 NAO CONTATAR" — reprovada). **Não confirmar entrega na de teste**: geraria R$ 40 "a pagar" falsos (se acontecer, cancelar com motivo).
+- 2 indicações, **ambas de TESTE** ("TESTE E28 INDICACAO CAROL" — aprovada; "TESTE E28 NAO CONTATAR" — reprovada). **Não confirmar entrega na de teste**: geraria R$ 40 "a pagar" falsos (se acontecer, cancelar com motivo). Com a E3.5 elas podem ser **invalidadas** pelo Admin (motivo: "indicação de teste do sistema").
 - 0 recompensas.
 
 ### Ainda não existe
-- Invalidar indicação pelo Admin (colunas `invalidada_*` existem, sem função) — necessário para limpar as indicações de teste.
 - Inativar/rejeitar Embaixadora pelo Admin (status existem no enum, sem função).
 - Integração com o ConsigGold para confirmar a entrega automaticamente (`evento_origem_id` já existe para idempotência). Envolve dois sistemas: decidir antes, em ADR no Cérebro, como ligar a candidata do Recrutamento à vendedora do ConsigGold.
 - Formulário público "quero ser Embaixadora" (fora da V1; hoje só por convite).
