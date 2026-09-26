@@ -14,8 +14,8 @@
 // vez só aceita o `uid` já validado por `authorize`.
 //
 // SOMENTE LEITURA — nunca escreve em indicacoes_embaixadoras, leads,
-// embaixadoras nem em nenhuma outra tabela. Nunca consulta
-// recompensas_embaixadoras (fora de escopo da E2.9).
+// embaixadoras nem em nenhuma outra tabela. E3.4: lê (nunca escreve)
+// status/valor de recompensas_embaixadoras.
 
 import {
   buildIndicacoesResponse,

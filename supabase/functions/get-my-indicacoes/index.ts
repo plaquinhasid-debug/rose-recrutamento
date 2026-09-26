@@ -4,8 +4,8 @@
 // de indicações (nome da candidata, situação amigável, data) pra QUALQUER
 // usuário autenticado cujo `auth.uid()` corresponda a
 // `embaixadoras.user_id`, cujo status seja `ativa`, E que NÃO seja equipe.
-// SOMENTE LEITURA — nunca insere/atualiza/apaga nada, nunca toca em
-// `recompensas_embaixadoras` (fora de escopo da E2.9).
+// SOMENTE LEITURA — nunca insere/atualiza/apaga nada. E3.4: passa a LER
+// status/valor de `recompensas_embaixadoras` (nunca escreve).
 //
 // Function NOVA e SEPARADA de get-my-embaixadora (decisão de arquitetura
 // E2.9, seção 4) — nunca estende aquela function já validada em produção.
@@ -97,7 +97,7 @@ Deno.serve(
     findIndicacoes: async (embaixadoraId) => {
       const { data, error } = await serviceClient
         .from("indicacoes_embaixadoras")
-        .select("status, primeira_atribuicao_em, leads(nome, status, etapa_pos_aprovacao)")
+        .select("status, primeira_atribuicao_em, leads(nome, status, etapa_pos_aprovacao), recompensas_embaixadoras(status, valor_centavos)")
         .eq("embaixadora_id", embaixadoraId)
         .eq("status", "atribuida")
         .order("primeira_atribuicao_em", { ascending: false })

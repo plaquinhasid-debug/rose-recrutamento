@@ -9,15 +9,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { formatDate } from "@/lib/format"
+import { formatCentavos, recompensaTexto } from "@/lib/myIndicacoes"
 import { buildReferralUrl, buildWhatsappShareMessage, buildWhatsappShareUrl, copyReferralLink } from "@/lib/referralLink"
 
-// IMPLEMENTATION-EMBAIXADORAS-E2.7-B/E2.8/E2.9 — Portal Mínimo. Mostra SÓ
-// os 3 campos que `get-my-embaixadora` devolve (nome/status/codigo_referral)
-// + sair, o link pessoal de indicação (E2.8, montado localmente a partir do
-// `codigo_referral` já existente, sem chamada de rede nova), e agora (E2.9)
-// a lista de indicações já realizadas (`get-my-indicacoes`). Fora de
-// escopo, de propósito: recompensas, saldo, R$40, ConsigGold, mostruário,
-// ranking, gamificação — ver pedido da E2.9, seção "Fora do escopo".
+// IMPLEMENTATION-EMBAIXADORAS-E2.7-B/E2.8/E2.9/E3.4 — Portal da Embaixadora.
+// Mostra os 3 campos que `get-my-embaixadora` devolve (nome/status/
+// codigo_referral) + sair, o link pessoal de indicação (E2.8), a lista de
+// indicações (E2.9) e, desde a E3.4, os totais "A receber"/"Já recebido" e
+// a situação do prêmio de cada indicação — tudo vindo de
+// `get-my-indicacoes`, nunca calculado aqui. Continua fora de escopo:
+// ConsigGold, ranking, gamificação, motivo de cancelamento.
 
 const STATUS_LABEL: Record<string, string> = {
   ativa: "Ativa",
@@ -121,7 +122,19 @@ export default function EmbaixadoraPortalPage() {
                 : "Carregando..."}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            {indicacoesQuery.data ? (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-md bg-gold/10 p-3">
+                  <p className="text-xs text-muted-foreground">A receber</p>
+                  <p className="text-lg font-semibold text-foreground">{formatCentavos(indicacoesQuery.data.a_receber_centavos)}</p>
+                </div>
+                <div className="rounded-md bg-success/10 p-3">
+                  <p className="text-xs text-muted-foreground">Já recebido</p>
+                  <p className="text-lg font-semibold text-foreground">{formatCentavos(indicacoesQuery.data.recebido_centavos)}</p>
+                </div>
+              </div>
+            ) : null}
             {indicacoesQuery.isLoading ? (
               <p className="text-sm text-muted-foreground">Carregando suas indicações...</p>
             ) : !indicacoesQuery.data || indicacoesQuery.data.indicacoes.length === 0 ? (
@@ -133,6 +146,9 @@ export default function EmbaixadoraPortalPage() {
                     <p className="font-medium text-foreground">{indicacao.nome}</p>
                     <p className="text-sm text-muted-foreground">{SITUACAO_LABEL[indicacao.situacao]}</p>
                     <p className="text-xs text-muted-foreground">Indicada em {formatDate(indicacao.indicada_em)}</p>
+                    {recompensaTexto(indicacao) ? (
+                      <p className="mt-1 text-sm font-medium text-foreground">{recompensaTexto(indicacao)}</p>
+                    ) : null}
                   </li>
                 ))}
               </ul>

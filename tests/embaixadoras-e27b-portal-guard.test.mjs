@@ -295,7 +295,10 @@ test("PORTAL: EmbaixadoraPortalPage não RENDERIZA/IMPLEMENTA recompensas/saldo/
   // palavra passou a ser esperada. O que continua proibido é qualquer
   // rastro de recompensa/saldo/ConsigGold/R$40, e nomes de tabela crus
   // (nunca deveriam aparecer no frontend de qualquer forma).
-  assert.doesNotMatch(codeOnly, /recompensa|saldo|consiggold|r\$\s*40|indicacoes_embaixadoras|recompensas_embaixadoras/i)
+  // E3.4: prêmio/totais passaram a ser escopo real (vindos de get-my-indicacoes).
+  // Continua proibido: ConsigGold, motivo de cancelamento, valor fixo no
+  // código e nomes de tabela crus.
+  assert.doesNotMatch(codeOnly, /consiggold|motivo|r\$\s*40|4000|indicacoes_embaixadoras|recompensas_embaixadoras/i)
 })
 
 // =========================================================================

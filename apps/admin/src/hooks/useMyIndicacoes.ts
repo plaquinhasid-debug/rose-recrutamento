@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "@/context/AuthContext"
 import { fetchMinhasIndicacoes } from "@/lib/myIndicacoes"
 
-export type { IndicacaoItem, MinhasIndicacoes, SituacaoIndicacao } from "@/lib/myIndicacoes"
+export type { IndicacaoItem, MinhasIndicacoes, RecompensaSituacao, SituacaoIndicacao } from "@/lib/myIndicacoes"
 
 /**
  * `queryKey` inclui `session.user.id` — mesmo padrão de useMyEmbaixadora.ts.

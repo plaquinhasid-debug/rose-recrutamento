@@ -207,7 +207,12 @@ test("A: Carol autenticada recebe a indicação do smoke da E2.8 -> 'TESTE E28 N
   const body = await res.json()
   assert.deepEqual(body, {
     total: 1,
-    indicacoes: [{ nome: "TESTE E28 NAO CONTATAR", situacao: "nao_aprovada", indicada_em: "2026-09-17T20:51:25.361Z" }],
+    indicacoes: [{
+      nome: "TESTE E28 NAO CONTATAR", situacao: "nao_aprovada", indicada_em: "2026-09-17T20:51:25.361Z",
+      recompensa_situacao: null, recompensa_valor_centavos: null,
+    }],
+    a_receber_centavos: 0,
+    recebido_centavos: 0,
   })
   assert.deepEqual(embaixadoraCalls, [CAROL_UID], "só o uid da Carol foi usado para localizar a Embaixadora")
   assert.deepEqual(indicacoesCalls, [CAROL_EMBAIXADORA_ID], "só o embaixadora_id DELA (resolvido internamente) foi usado na consulta")
@@ -218,7 +223,7 @@ test("C/ISOLAMENTO: outra Embaixadora recebe só a própria coleção (vazia no 
   const handler = createGetMyIndicacoesHandler(deps)
   const res = await handler(makeRequest({ authorization: "Bearer outra-valida" }))
   const body = await res.json()
-  assert.deepEqual(body, { total: 0, indicacoes: [] })
+  assert.deepEqual(body, { total: 0, indicacoes: [], a_receber_centavos: 0, recebido_centavos: 0 })
   assert.ok(!JSON.stringify(body).includes("TESTE E28"), "indicação da Carol nunca deveria vazar para outra Embaixadora")
 })
 
@@ -266,11 +271,11 @@ test("D: coleção vazia -> total 0, indicacoes [], nunca erro", async () => {
   const handler = createGetMyIndicacoesHandler(deps)
   const res = await handler(makeRequest({ authorization: "Bearer carol-valida" }))
   assert.equal(res.status, 200)
-  assert.deepEqual(await res.json(), { total: 0, indicacoes: [] })
+  assert.deepEqual(await res.json(), { total: 0, indicacoes: [], a_receber_centavos: 0, recebido_centavos: 0 })
 })
 
 test("logic D: buildIndicacoesResponse([]) -> { total: 0, indicacoes: [] }", () => {
-  assert.deepEqual(buildIndicacoesResponse([]), { total: 0, indicacoes: [] })
+  assert.deepEqual(buildIndicacoesResponse([]), { total: 0, indicacoes: [], a_receber_centavos: 0, recebido_centavos: 0 })
 })
 
 // =========================================================================
@@ -311,7 +316,7 @@ test("LEAD REMOVIDO: linha com leads=null (lead_id apagado) é omitida, resposta
 test("LEAD REMOVIDO: só isso na coleção -> total 0, sem lançar exceção", () => {
   assert.doesNotThrow(() => {
     const result = buildIndicacoesResponse([{ status: "atribuida", primeira_atribuicao_em: "2026-09-19T00:00:00.000Z", leads: null }])
-    assert.deepEqual(result, { total: 0, indicacoes: [] })
+    assert.deepEqual(result, { total: 0, indicacoes: [], a_receber_centavos: 0, recebido_centavos: 0 })
   })
 })
 
@@ -390,8 +395,9 @@ test("MINIMIZAÇÃO: mesmo se findIndicacoes devolver campos extras (telefone, i
   const handler = createGetMyIndicacoesHandler(deps)
   const res = await handler(makeRequest({ authorization: "Bearer carol-valida" }))
   const body = await res.json()
-  assert.deepEqual(Object.keys(body).sort(), ["indicacoes", "total"])
-  assert.deepEqual(Object.keys(body.indicacoes[0]).sort(), ["indicada_em", "nome", "situacao"])
+  // E3.4: resposta ganhou os totais e a situação do prêmio por item — nada além disso.
+  assert.deepEqual(Object.keys(body).sort(), ["a_receber_centavos", "indicacoes", "recebido_centavos", "total"])
+  assert.deepEqual(Object.keys(body.indicacoes[0]).sort(), ["indicada_em", "nome", "recompensa_situacao", "recompensa_valor_centavos", "situacao"])
   const bodyText = JSON.stringify(body)
   for (const forbidden of [
     "lead_id", "embaixadora_id", "codigo_referral_usado", "candidata_telefone_normalizado",
@@ -420,7 +426,9 @@ test("SOMENTE LEITURA: index.ts nunca escreve em nenhuma tabela, nunca toca reco
     assert.ok(!codeOnly.includes(writeMethod), `index.ts não deveria conter '${writeMethod}' — esta function é somente leitura`)
   }
   assert.ok(!/\.rpc\(/.test(codeOnly), "não deveria chamar nenhuma RPC mutante")
-  assert.doesNotMatch(codeOnly, /recompensas_embaixadoras/i, "nunca deveria tocar em recompensas_embaixadoras (fora de escopo da E2.9)")
+  // E3.4: passa a LER só status/valor de recompensas_embaixadoras (nunca escrever — ver writeMethod acima).
+  assert.match(codeOnly, /recompensas_embaixadoras\(status, valor_centavos\)/, "embed de recompensas deveria pedir só status e valor_centavos")
+  assert.doesNotMatch(codeOnly, /cancelada_motivo|pago_por|cancelada_por/, "nunca deveria ler motivo nem autor de pagamento/cancelamento")
 })
 
 test("index.ts: SELECT explícito — leads() embedded pede só nome/status/etapa_pos_aprovacao, nunca '*'", () => {
@@ -524,7 +532,15 @@ test("HOOK: 200 com dado válido -> objeto projetado", async () => {
     data: { total: 1, indicacoes: [{ nome: "TESTE E28 NAO CONTATAR", situacao: "nao_aprovada", indicada_em: "2026-09-17T20:51:25.361Z" }] },
     error: null,
   }))
-  assert.deepEqual(result, { total: 1, indicacoes: [{ nome: "TESTE E28 NAO CONTATAR", situacao: "nao_aprovada", indicada_em: "2026-09-17T20:51:25.361Z" }] })
+  assert.deepEqual(result, {
+    total: 1,
+    indicacoes: [{
+      nome: "TESTE E28 NAO CONTATAR", situacao: "nao_aprovada", indicada_em: "2026-09-17T20:51:25.361Z",
+      recompensa_situacao: null, recompensa_valor_centavos: null,
+    }],
+    a_receber_centavos: 0,
+    recebido_centavos: 0,
+  })
 })
 
 test("HOOK: 404 -> { total: 0, indicacoes: [] }, nunca lançado como erro", async () => {
@@ -533,7 +549,7 @@ test("HOOK: 404 -> { total: 0, indicacoes: [] }, nunca lançado como erro", asyn
     data: null,
     error: new FunctionsHttpError(new Response(JSON.stringify({ error: "embaixadora_nao_encontrada" }), { status: 404 })),
   }))
-  assert.deepEqual(result, { total: 0, indicacoes: [] })
+  assert.deepEqual(result, { total: 0, indicacoes: [], a_receber_centavos: 0, recebido_centavos: 0 })
 })
 
 for (const status of [401, 403, 500]) {
@@ -573,7 +589,7 @@ test("PARSE: projeta só os 3 campos por item, descarta extras", () => {
     total: 1,
     indicacoes: [{ nome: "Carol Test", situacao: "aprovada", indicada_em: "2026-09-17T00:00:00.000Z", lead_id: "vazar", telefone: "vazar" }],
   })
-  assert.deepEqual(Object.keys(result.indicacoes[0]).sort(), ["indicada_em", "nome", "situacao"])
+  assert.deepEqual(Object.keys(result.indicacoes[0]).sort(), ["indicada_em", "nome", "recompensa_situacao", "recompensa_valor_centavos", "situacao"])
 })
 
 // =========================================================================
@@ -598,10 +614,10 @@ test("PORTAL: seção 'Indique uma amiga' continua presente e intocada", () => {
   assert.match(source, /buildReferralUrl/)
 })
 
-test("PORTAL: nunca menciona recompensa/saldo/ConsigGold/R\\$40 (fora de escopo da E2.9)", () => {
+test("PORTAL: nunca menciona ConsigGold nem motivo de cancelamento; valores só formatados, nunca R$40 fixo no código (E3.4)", () => {
   const source = fs.readFileSync(new URL("../apps/admin/src/pages/EmbaixadoraPortalPage.tsx", import.meta.url), "utf8")
   const codeOnly = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "")
-  assert.doesNotMatch(codeOnly, /recompensa|saldo|consiggold|r\$\s*40/i)
+  assert.doesNotMatch(codeOnly, /consiggold|cancelad|motivo|r\$\s*40|4000/i)
 })
 
 test("PORTAL: mapa de rótulos cobre exatamente os 3 estados públicos", () => {

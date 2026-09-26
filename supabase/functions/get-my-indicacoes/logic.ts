@@ -4,7 +4,8 @@
 // real (Supabase Auth + banco).
 //
 // E2.9 — "Minhas indicações" no Portal da Embaixadora. SOMENTE LEITURA;
-// nunca cria/altera/apaga nada, nunca toca em recompensas_embaixadoras.
+// nunca cria/altera/apaga nada. E3.4 — passa a LER (nunca escrever) a
+// situação da recompensa de R$40 de cada indicação + totais.
 
 // Duplicado localmente (não importado de get-my-embaixadora/logic.ts):
 // cada Edge Function é empacotada/deployada como bundle isolado — um import
@@ -40,28 +41,73 @@ export function mapSituacao(status: LeadStatusRaw, etapaPosAprovacao: EtapaPosAp
   return "em_analise"
 }
 
+export type RecompensaStatusRaw = "disponivel" | "pago" | "cancelada"
+
+interface RecompensaJoin {
+  status: RecompensaStatusRaw
+  valor_centavos: number
+}
+
 /**
  * Formato cru de uma linha vinda do JOIN `indicacoes_embaixadoras` ->
  * `leads` (embedded select do PostgREST). `leads` é `null` quando
  * `lead_id` é null — caso real de `ON DELETE SET NULL` se o lead for
  * apagado no futuro (decisão E2.9, seção 2: omitir, nunca quebrar).
+ * E3.4: `recompensas_embaixadoras` (1:1 por UNIQUE indicacao_id) pode vir
+ * como objeto, array ou null — normalizado em `pickRecompensa`. Opcional
+ * pra compatibilidade com linhas sem o embed.
  */
 export interface IndicacaoJoinRow {
   status: IndicacaoStatusRaw
   primeira_atribuicao_em: string
   leads: { nome: string; status: LeadStatusRaw; etapa_pos_aprovacao: EtapaPosAprovacaoRaw } | null
+  recompensas_embaixadoras?: RecompensaJoin | RecompensaJoin[] | null
 }
 
-/** Formato exato devolvido à Embaixadora — só os 3 campos aprovados no contrato (E2.9, seção 5). */
+/**
+ * E3.4 — situação pública da recompensa de R$40, vista pela Embaixadora:
+ * - "aguardando_mostruario": candidata aprovada, entrega ainda não confirmada;
+ * - "a_receber": entrega confirmada, Pix ainda não feito;
+ * - "recebida": Pix feito.
+ * `null` = não se aplica (em análise, não aprovada) OU recompensa cancelada
+ * — cancelamento nunca é exposto à Embaixadora (motivo é interno).
+ */
+export type RecompensaSituacaoPublica = "aguardando_mostruario" | "a_receber" | "recebida"
+
+/** Formato exato devolvido à Embaixadora (E2.9 + E3.4). */
 export interface IndicacaoItem {
   nome: string
   situacao: SituacaoPublica
   indicada_em: string
+  recompensa_situacao: RecompensaSituacaoPublica | null
+  /** Só preenchido em "a_receber"/"recebida" — valor vindo do banco, nunca calculado aqui. */
+  recompensa_valor_centavos: number | null
 }
 
 export interface MinhasIndicacoesResponse {
   total: number
   indicacoes: IndicacaoItem[]
+  /** E3.4 — soma dos valores das recompensas "a_receber" das indicações listadas. */
+  a_receber_centavos: number
+  /** E3.4 — soma dos valores das recompensas "recebida" das indicações listadas. */
+  recebido_centavos: number
+}
+
+function pickRecompensa(value: IndicacaoJoinRow["recompensas_embaixadoras"]): RecompensaJoin | null {
+  if (!value) return null
+  if (Array.isArray(value)) return value[0] ?? null
+  return value
+}
+
+/** E3.4 — mapeia a recompensa crua pra situação pública (ver `RecompensaSituacaoPublica`). */
+export function mapRecompensa(
+  situacao: SituacaoPublica,
+  recompensa: RecompensaJoin | null,
+): { recompensa_situacao: RecompensaSituacaoPublica | null; recompensa_valor_centavos: number | null } {
+  if (recompensa?.status === "disponivel") return { recompensa_situacao: "a_receber", recompensa_valor_centavos: recompensa.valor_centavos }
+  if (recompensa?.status === "pago") return { recompensa_situacao: "recebida", recompensa_valor_centavos: recompensa.valor_centavos }
+  if (!recompensa && situacao === "aprovada") return { recompensa_situacao: "aguardando_mostruario", recompensa_valor_centavos: null }
+  return { recompensa_situacao: null, recompensa_valor_centavos: null }
 }
 
 /**
@@ -82,12 +128,23 @@ export function buildIndicacoesResponse(rows: readonly IndicacaoJoinRow[]): Minh
   for (const row of rows) {
     if (row.status !== "atribuida") continue
     if (!row.leads) continue
+    const situacao = mapSituacao(row.leads.status, row.leads.etapa_pos_aprovacao)
+    const { recompensa_situacao, recompensa_valor_centavos } = mapRecompensa(situacao, pickRecompensa(row.recompensas_embaixadoras))
     indicacoes.push({
       nome: row.leads.nome,
-      situacao: mapSituacao(row.leads.status, row.leads.etapa_pos_aprovacao),
+      situacao,
       indicada_em: row.primeira_atribuicao_em,
+      recompensa_situacao,
+      recompensa_valor_centavos,
     })
   }
   indicacoes.sort((a, b) => new Date(b.indicada_em).getTime() - new Date(a.indicada_em).getTime())
-  return { total: indicacoes.length, indicacoes }
+  // Totais = só SOMA de valores já gravados no banco (nunca recalcula a regra).
+  let a_receber_centavos = 0
+  let recebido_centavos = 0
+  for (const item of indicacoes) {
+    if (item.recompensa_situacao === "a_receber") a_receber_centavos += item.recompensa_valor_centavos ?? 0
+    if (item.recompensa_situacao === "recebida") recebido_centavos += item.recompensa_valor_centavos ?? 0
+  }
+  return { total: indicacoes.length, indicacoes, a_receber_centavos, recebido_centavos }
 }

@@ -10,16 +10,25 @@ import { supabase } from "@/lib/supabase"
 
 export type SituacaoIndicacao = "em_analise" | "aprovada" | "nao_aprovada"
 
+/** E3.4 — situação pública da recompensa de R$40 (cancelada nunca chega aqui). */
+export type RecompensaSituacao = "aguardando_mostruario" | "a_receber" | "recebida"
+
 export interface IndicacaoItem {
   nome: string
   situacao: SituacaoIndicacao
   indicada_em: string
+  recompensa_situacao: RecompensaSituacao | null
+  recompensa_valor_centavos: number | null
 }
 
 export interface MinhasIndicacoes {
   total: number
   indicacoes: IndicacaoItem[]
+  a_receber_centavos: number
+  recebido_centavos: number
 }
+
+const VAZIO: MinhasIndicacoes = { total: 0, indicacoes: [], a_receber_centavos: 0, recebido_centavos: 0 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -27,6 +36,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isSituacaoIndicacao(value: unknown): value is SituacaoIndicacao {
   return value === "em_analise" || value === "aprovada" || value === "nao_aprovada"
+}
+
+function isRecompensaSituacao(value: unknown): value is RecompensaSituacao {
+  return value === "aguardando_mostruario" || value === "a_receber" || value === "recebida"
+}
+
+function centavosOuZero(value: unknown): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : 0
 }
 
 function parseIndicacaoItem(value: unknown): IndicacaoItem | null {
@@ -38,7 +55,18 @@ function parseIndicacaoItem(value: unknown): IndicacaoItem | null {
   ) {
     return null
   }
-  return { nome: value.nome, situacao: value.situacao, indicada_em: value.indicada_em }
+  // E3.4 — recompensa ausente/malformada vira "sem informação" (null), nunca derruba o item.
+  const recompensaSituacao = isRecompensaSituacao(value.recompensa_situacao) ? value.recompensa_situacao : null
+  const valor = typeof value.recompensa_valor_centavos === "number" && Number.isInteger(value.recompensa_valor_centavos)
+    ? value.recompensa_valor_centavos
+    : null
+  return {
+    nome: value.nome,
+    situacao: value.situacao,
+    indicada_em: value.indicada_em,
+    recompensa_situacao: recompensaSituacao,
+    recompensa_valor_centavos: recompensaSituacao === "a_receber" || recompensaSituacao === "recebida" ? valor : null,
+  }
 }
 
 /**
@@ -57,7 +85,25 @@ export function parseMinhasIndicacoes(value: unknown): MinhasIndicacoes | null {
     const item = parseIndicacaoItem(raw)
     if (item) indicacoes.push(item)
   }
-  return { total: value.total, indicacoes }
+  return {
+    total: value.total,
+    indicacoes,
+    a_receber_centavos: centavosOuZero(value.a_receber_centavos),
+    recebido_centavos: centavosOuZero(value.recebido_centavos),
+  }
+}
+
+/** E3.4 — "R$ 40,00" a partir de centavos (só formatação, nunca cálculo de regra). */
+export function formatCentavos(valorCentavos: number): string {
+  return (valorCentavos / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+}
+
+/** E3.4 — texto da recompensa de cada indicação no Portal. `null` = não mostra nada. */
+export function recompensaTexto(item: Pick<IndicacaoItem, "recompensa_situacao" | "recompensa_valor_centavos">): string | null {
+  if (item.recompensa_situacao === "aguardando_mostruario") return "Seu prêmio: aguardando a entrega do mostruário"
+  if (item.recompensa_situacao === "a_receber") return `Seu prêmio: ${formatCentavos(item.recompensa_valor_centavos ?? 0)} a receber`
+  if (item.recompensa_situacao === "recebida") return `Seu prêmio: ${formatCentavos(item.recompensa_valor_centavos ?? 0)} recebido`
+  return null
 }
 
 type FunctionsInvoke = typeof supabase.functions.invoke
@@ -77,9 +123,9 @@ export async function fetchMinhasIndicacoes(
   const { data, error } = await invoke<unknown>("get-my-indicacoes", { method: "GET" })
   if (error) {
     if (error instanceof FunctionsHttpError && error.context instanceof Response && error.context.status === 404) {
-      return { total: 0, indicacoes: [] }
+      return { ...VAZIO, indicacoes: [] }
     }
     throw error
   }
-  return parseMinhasIndicacoes(data) ?? { total: 0, indicacoes: [] }
+  return parseMinhasIndicacoes(data) ?? { ...VAZIO, indicacoes: [] }
 }

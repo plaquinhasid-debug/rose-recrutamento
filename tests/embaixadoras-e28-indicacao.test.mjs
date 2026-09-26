@@ -326,7 +326,8 @@ test("EmbaixadoraPortalPage.tsx: mostra o link, botão Copiar link e botão Comp
 
 test("EmbaixadoraPortalPage.tsx: não implementa indicações realizadas/conversões/recompensas/saldo/ConsigGold/R$40 (fora de escopo da E2.8)", () => {
   const code = codeOnly("../apps/admin/src/pages/EmbaixadoraPortalPage.tsx")
-  assert.doesNotMatch(code, /indicações realizadas|convers(ã|a)o|recompensa|saldo|consiggold|r\$\s*40|dashboard/i)
+  // E3.4: prêmio/totais passaram a ser escopo real; continua proibido o resto.
+  assert.doesNotMatch(code, /indicações realizadas|convers(ã|a)o|consiggold|r\$\s*40|dashboard/i)
 })
 
 test("EmbaixadoraPortalPage.tsx: nunca faz chamada de rede nova — usa só o codigo_referral que useMyEmbaixadora já devolve", () => {
