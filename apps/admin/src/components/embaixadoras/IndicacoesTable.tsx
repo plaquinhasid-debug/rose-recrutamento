@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/common/EmptyState"
 import { ConfirmarMostruarioDialog } from "@/components/embaixadoras/ConfirmarMostruarioDialog"
 import { RecompensaAcoes } from "@/components/embaixadoras/RecompensaAcoes"
+import { InvalidarIndicacaoDialog } from "@/components/embaixadoras/InvalidarIndicacaoDialog"
 import { formatDate } from "@/lib/format"
 import { candidataSituacao, recompensaSituacao } from "@/lib/indicacaoAdminLabels"
 import type { IndicacaoAdmin } from "@/hooks/useIndicacoesAdmin"
@@ -85,6 +86,12 @@ const columns = [
   columnHelper.accessor("indicada_em", {
     header: "Indicada em",
     cell: (info) => formatDate(info.getValue()),
+  }),
+  // E3.5: a própria InvalidarIndicacaoDialog decide se aparece.
+  columnHelper.display({
+    id: "acoes",
+    header: "Ações",
+    cell: (info) => <InvalidarIndicacaoDialog indicacao={info.row.original} />,
   }),
 ]
 
