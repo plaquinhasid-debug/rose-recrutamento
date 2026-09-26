@@ -16,12 +16,13 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/common/EmptyState"
+import { ConfirmarMostruarioDialog } from "@/components/embaixadoras/ConfirmarMostruarioDialog"
 import { formatDate } from "@/lib/format"
 import { candidataSituacao, recompensaSituacao } from "@/lib/indicacaoAdminLabels"
 import type { IndicacaoAdmin } from "@/hooks/useIndicacoesAdmin"
 
-// IMPLEMENTATION-EMBAIXADORAS-E3.1 — somente leitura. A ação "Confirmar
-// primeiro mostruário" (só Tania) entra na E3.2.
+// IMPLEMENTATION-EMBAIXADORAS-E3.1/E3.2 — lista + ação "Confirmar entrega"
+// do primeiro mostruário (conta da equipe, compartilhada com a Tania).
 
 const columnHelper = createColumnHelper<IndicacaoAdmin>()
 
@@ -71,7 +72,12 @@ const columns = [
     header: "Recompensa",
     cell: (info) => {
       const situacao = recompensaSituacao(info.row.original)
-      return <Badge variant={situacao.variant}>{situacao.label}</Badge>
+      return (
+        <div className="flex flex-col items-start gap-2">
+          <Badge variant={situacao.variant}>{situacao.label}</Badge>
+          <ConfirmarMostruarioDialog indicacao={info.row.original} />
+        </div>
+      )
     },
   }),
   columnHelper.accessor("indicada_em", {
