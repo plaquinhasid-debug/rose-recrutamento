@@ -98,7 +98,8 @@ export default function EmbaixadoraPortalPage() {
               <Label htmlFor="referral-link">Seu link de indicação</Label>
               <Input id="referral-link" readOnly autoComplete="off" value={referralUrl} onFocus={(event) => event.currentTarget.select()} />
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
+            {/* Sempre empilhados: o card tem largura máxima pequena (max-w-sm) e os dois botões lado a lado vazavam para fora dele. */}
+            <div className="flex flex-col gap-2">
               <Button type="button" variant="gold" className="w-full" asChild>
                 <a href={whatsappShareUrl} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="size-4" />
