@@ -54,6 +54,7 @@
     "test:embaixadoras-e29-minhas-indicacoes": "node --import ./tests/register-ts-loader.mjs --test tests/embaixadoras-e29-minhas-indicacoes.test.mjs",
     "test:embaixadoras-e31-indicacoes-admin": "node --import ./tests/register-ts-loader.mjs --test tests/embaixadoras-e31-indicacoes-admin.test.mjs",
     "test:embaixadoras-e32-confirmar-mostruario": "node --import ./tests/register-ts-loader.mjs --test tests/embaixadoras-e32-confirmar-mostruario.test.mjs",
+    "test:embaixadoras-e33-recompensa-status": "node --import ./tests/register-ts-loader.mjs --test tests/embaixadoras-e33-recompensa-status.test.mjs",
     "dev:landing": "npm run dev --workspace=@tania-joias/landing",
     "dev:admin": "npm run dev --workspace=@tania-joias/admin",
     "build:landing": "npm run build --workspace=@tania-joias/landing",

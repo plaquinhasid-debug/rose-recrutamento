@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/common/EmptyState"
 import { ConfirmarMostruarioDialog } from "@/components/embaixadoras/ConfirmarMostruarioDialog"
+import { RecompensaAcoes } from "@/components/embaixadoras/RecompensaAcoes"
 import { formatDate } from "@/lib/format"
 import { candidataSituacao, recompensaSituacao } from "@/lib/indicacaoAdminLabels"
 import type { IndicacaoAdmin } from "@/hooks/useIndicacoesAdmin"
@@ -76,6 +77,7 @@ const columns = [
         <div className="flex flex-col items-start gap-2">
           <Badge variant={situacao.variant}>{situacao.label}</Badge>
           <ConfirmarMostruarioDialog indicacao={info.row.original} />
+          <RecompensaAcoes indicacao={info.row.original} />
         </div>
       )
     },
