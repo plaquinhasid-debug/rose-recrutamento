@@ -1,5 +1,7 @@
 # PROJECT_STATUS.md — Tania Joias / Sofia
 
+> **Atualização de 2026-09-26:** nova **seção 9 (Programa Embaixadoras, E1 a E3.4)** e novas notas de publicação na **seção 8**, verificadas nesta data. **As seções 1 a 7 continuam descrevendo o estado de 2026-08-04 e NÃO foram revalidadas** — em especial o status da FEATURE-005 e do WhatsApp automático, e a lista de Edge Functions da seção 5 (hoje há mais funções, ver seção 9).
+
 > Atualizado em 2026-08-04. A própria Tania LIGOU as duas flags de IA (`sofia_ia_ativa` e `sofia_perguntas_ia_ativa`) em produção — confirmado direto no banco. Landing e Admin redeployados com o código do FEATURE-004. Além disso: texto da mensagem manual de WhatsApp (Admin) atualizado, e "Ganhe até 40% de comissão!" adicionado em 2 lugares na Landing Page (Hero + card de benefício). **FEATURE-005** (classificação contextual + "condução natural" da Sofia, modo Shadow) foi construída em 5 partes incrementais, cada uma testada isoladamente — código pronto e commitado, mas **migration ainda não aplicada e nada ainda publicado** — ver seção 6. A ideia do WhatsApp automático segue desenhada mas não implementada. Mantido a cada mudança importante para não perder histórico entre sessões. Este arquivo descreve o estado real do código e da infraestrutura — não é um roadmap nem uma proposta.
 
 ---
@@ -127,3 +129,44 @@ Assim que uma candidata é aprovada (pela IPR na hora, ou manualmente pela equip
 - **Vercel (Landing e Admin)**: `git push` também não dispara build de forma confiável — o fluxo confiável é `vercel --prod --yes` rodado manualmente no terminal, na raiz do repo. `.vercel/project.json` fica normalmente linkado no projeto `tania-joias-landing`; pra publicar o Admin (`tania-joias-recrutamento`) é preciso relinkar antes (`vercel link --yes --project tania-joias-recrutamento`), publicar, e depois relinkar de volta pro `tania-joias-landing` (`vercel link --yes --project tania-joias-landing`) — senão o próximo deploy da Landing vai pro projeto errado.
 - **Verificação pós-deploy**: depois de publicar, sempre vale conferir se o bundle JS realmente mudou (buscar a página, extrair os `<script src>`, checar se contém algum texto/símbolo novo) — já aconteceu de um app ser redeployado e o outro não, e a mudança "sumir" sem erro nenhum.
 - Projeto Supabase: `tania-joias-crm`, ref `iaqzbernshmhkqznleye`, região `sa-east-1`. Projetos Vercel: `tania-joias-landing` e `tania-joias-recrutamento`, time `plaquinhasid-8956s-projects`.
+- **Atualização 2026-09-26 (fluxo usado nas etapas E3.x, funcionou):**
+  - Edge Functions: `npx supabase functions deploy <nome> --project-ref iaqzbernshmhkqznleye` (CLI já logado na máquina). Conferência rápida: `curl` sem login deve devolver **401**.
+  - Admin: `npx vercel --prod --cwd apps/admin`, rodado da raiz do repo. O `.vercel/repo.json` mapeia `apps/admin` → `tania-joias-recrutamento`, então **não precisa relinkar**. ⚠️ Rodar `vercel --prod` na **raiz sem `--cwd`** publica a **Landing** (aconteceu em 2026-09-26, sem dano, código idêntico).
+  - Verificação: baixar o bundle público de `recrutamento.taniajoiasmaua.com.br` e procurar um texto novo.
+
+## 9. Programa Embaixadoras (atualizado em 2026-09-26)
+
+Programa de indicação: uma Embaixadora convidada indica candidatas pelo link pessoal; quando a indicada recebe o **primeiro mostruário**, a Embaixadora ganha **R$ 40,00 via Pix**. Vive inteiro dentro deste repositório (Admin, Landing e Supabase) — não é um projeto separado.
+
+### Regras de negócio (decididas pelo dono em 2026-09-26)
+- "Primeiro mostruário" = quando o mostruário é **entregue** à vendedora indicada; a equipe informa a data.
+- Só a Tania confirma — na prática, a **conta da equipe** (`is_equipe()`), que hoje é **uma só e compartilhada** entre o dono e a Tania; o sistema não distingue a pessoa.
+- Pagamento é por **Pix, feito fora do sistema**; o sistema só registra "pago".
+- O valor (R$ 40,00 = 4000 centavos) vem do **DEFAULT da coluna** `recompensas_embaixadoras.valor_centavos`; nenhum cliente envia nem calcula valor.
+
+### Etapas e o que está no ar
+
+| Etapa | O que faz | Onde |
+|---|---|---|
+| E1-A / E2.1–E2.2 | Tabelas `embaixadoras`, `indicacoes_embaixadoras`, `recompensas_embaixadoras` (RLS sem policies + REVOKE — acesso só via Edge Function); hardening de convite (hash SHA-256, expiração) e `is_equipe()` | migrations 2026-09-15 a 2026-09-17 |
+| E2.3–E2.6 | Admin: listar, convidar, resgatar e reenviar convite | `list-ambassadors-admin`, `create-ambassador-invite`, `validate-ambassador-invite`, `redeem-ambassador-invite`, `resend-ambassador-invite` |
+| E2.7-B | Portal da Embaixadora (`/portal-embaixadora`), separado da área da equipe | `get-my-embaixadora` |
+| E2.8 | Link `?ref=CODIGO` na Landing; `finalize-candidate` registra a indicação (primeira indicação vence, por telefone) | `finalize-candidate` |
+| E2.9 | Portal: "Minhas indicações" | `get-my-indicacoes` |
+| **E3.1** | Admin: aba **Indicações** (Embaixadoras → Indicações), somente leitura | `list-indicacoes-admin` |
+| **E3.2** | Admin: botão **"Confirmar entrega"** → cria a recompensa `disponivel` (a pagar). Bloqueia candidata não aprovada/desistente, data futura ou anterior à indicação; UNIQUE impede duplicidade (409) | `confirm-primeiro-mostruario` |
+| **E3.3** | Admin: **"Marcar como paga"** (data do Pix) ou **"Cancelar"** (motivo obrigatório). Só a partir de `disponivel`; pago/cancelada são finais; UPDATE com `status='disponivel'` evita corrida | `update-recompensa-status` |
+| **E3.4** | Portal: totais **"A receber" / "Já recebido"** e o prêmio de cada indicação. Cancelada e motivo **nunca** aparecem para a Embaixadora | `get-my-indicacoes` (atualizada) |
+
+Commits das E3.x: `3b35e1e` (E3.1), `66c9883` (E3.2), `7f8bafe` (E3.3), `17afc2a` (E3.4), `e755f2b` (ajuste visual do Portal). Todos publicados e conferidos em 2026-09-26. Testes: 1068/1068 passando (`node --import ./tests/register-ts-loader.mjs --test tests/*.test.mjs`).
+
+### Estado dos dados em produção (2026-09-26)
+- 1 Embaixadora ativa (Carol, código `7E9NH4VD`).
+- 2 indicações, **ambas de TESTE** ("TESTE E28 INDICACAO CAROL" — aprovada; "TESTE E28 NAO CONTATAR" — reprovada). **Não confirmar entrega na de teste**: geraria R$ 40 "a pagar" falsos (se acontecer, cancelar com motivo).
+- 0 recompensas.
+
+### Ainda não existe
+- Invalidar indicação pelo Admin (colunas `invalidada_*` existem, sem função) — necessário para limpar as indicações de teste.
+- Inativar/rejeitar Embaixadora pelo Admin (status existem no enum, sem função).
+- Integração com o ConsigGold para confirmar a entrega automaticamente (`evento_origem_id` já existe para idempotência). Envolve dois sistemas: decidir antes, em ADR no Cérebro, como ligar a candidata do Recrutamento à vendedora do ConsigGold.
+- Formulário público "quero ser Embaixadora" (fora da V1; hoje só por convite).
