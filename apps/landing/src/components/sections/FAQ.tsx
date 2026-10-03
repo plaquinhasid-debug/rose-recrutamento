@@ -9,34 +9,59 @@ import { Reveal } from "@/components/Reveal"
 
 const FAQ_ITEMS = [
   {
-    question: "Preciso estar empregada para participar?",
+    question: "Como funciona? Preciso comprar estoque?",
     answer:
-      "Hoje priorizamos candidatas que já estejam trabalhando, pois isso costuma indicar mais estabilidade para conciliar a revenda. Se não for o seu caso no momento, seu cadastro fica salvo para futuras oportunidades.",
+      `Não! A ${BRAND.nome} trabalha no sistema de consignação. Você recebe o mostruário com as peças, vende durante 30 dias e depois vem até a loja para fazer o acerto: paga só o que vendeu e devolve o restante. Sem investimento inicial e sem risco.`,
   },
   {
-    question: "Preciso investir algum valor para começar?",
+    question: "Qual é a comissão que vou ganhar?",
     answer:
-      `Não. Você não precisa comprar estoque antecipado para começar a revender com a ${BRAND.nome}.`,
+      "A comissão começa em 30% e pode chegar a 50% conforme o seu volume de vendas. Quanto mais você vende, maior a sua porcentagem. Tudo combinado com transparência na hora do acerto.",
+  },
+  {
+    question: "Quantas peças recebo no primeiro mostruário?",
+    answer:
+      "No primeiro mostruário você recebe cerca de 50 peças. São semijoias selecionadas para facilitar a sua apresentação para as clientes, incluindo brincos, anéis, colares e pulseiras.",
+  },
+  {
+    question: "Com que frequência faço o acerto?",
+    answer:
+      `O acerto é feito uma vez por mês, 30 dias após pegar o mostruário. Você vem até a ${BRAND.nome}, apresenta o que vendeu, faz o pagamento e pode renovar as peças.`,
   },
   {
     question: "Preciso ter experiência com vendas?",
     answer:
-      "Não é obrigatório. Damos treinamento completo para quem está começando agora. Ter alguma experiência é um diferencial, mas não é exigido.",
+      "Não é obrigatório. Damos treinamento completo para quem está começando agora. Ter experiência com vendas de roupas, cosméticos ou joias conta como diferencial, mas não é exigido.",
   },
   {
-    question: "Quanto tempo por dia preciso dedicar?",
+    question: "Qual é a idade mínima para participar?",
     answer:
-      "Você decide. Muitas revendedoras começam com 1 a 2 horas por dia e ajustam o ritmo conforme os resultados.",
+      "A idade mínima é 18 anos.",
   },
   {
-    question: "Como recebo o Mostruário de produtos?",
+    question: "Preciso ter Instagram para me candidatar?",
     answer:
-      "Após a aprovação do seu cadastro, nossa equipe libera o acesso ao Mostruário completo e aos materiais de divulgação.",
+      "Sim! O Instagram é obrigatório no nosso processo. Ele é importante para a análise do perfil e também será uma das suas principais ferramentas de vendas. Instagram pessoal e profissional (se tiver) devem ser informados.",
+  },
+  {
+    question: "Preciso estar empregada para participar?",
+    answer:
+      "Sim, priorizamos candidatas que estejam trabalhando atualmente. Ter estabilidade profissional é um fator importante no nosso processo de seleção.",
+  },
+  {
+    question: "A Rose atende a minha cidade?",
+    answer:
+      `Atendemos atualmente: ${BRAND.cidadesTexto}. Se você mora em outra cidade da região do ABC Paulista, entre em contato para verificarmos a viabilidade.`,
   },
   {
     question: "Em quanto tempo recebo uma resposta após o cadastro?",
     answer:
-      "Normalmente em poucos dias úteis. Você será avisada assim que sua candidatura for analisada.",
+      `Assim que recebermos sua candidatura, a ${BRAND.dona} analisa pessoalmente. Você será avisada por WhatsApp em alguns dias úteis.`,
+  },
+  {
+    question: "O que acontece depois que sou aprovada?",
+    answer:
+      `Após a pré-aprovação, a ${BRAND.dona} entra em contato pelo WhatsApp para dar os próximos passos. Você vai preencher uma ficha completa, enviar documentos (RG e comprovante de residência) e, depois, pegar o seu primeiro mostruário.`,
   },
 ]
 

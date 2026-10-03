@@ -8,23 +8,23 @@ interface ComoFuncionaProps {
 const STEPS = [
   {
     number: "01",
-    title: "Cadastro rápido",
-    text: "Converse com a Sofia, nossa assistente virtual, e conte um pouco sobre você. Leva menos de 2 minutos.",
+    title: "Candidatura rápida",
+    text: "Converse com a Sofia, nossa assistente, e conte um pouco sobre você. Leva menos de 2 minutos.",
   },
   {
     number: "02",
-    title: "Aprovação do perfil",
-    text: "Nossa equipe analisa seu cadastro e libera o acesso ao Mostruário e aos materiais de revenda.",
+    title: "Análise e pré-aprovação",
+    text: "A Carol analisa seu perfil pessoalmente e entra em contato pelo WhatsApp. Você preenche a ficha completa e envia seus documentos.",
   },
   {
     number: "03",
-    title: "Treinamento e Mostruário",
-    text: "Você recebe treinamento completo, tabela de preços e conteúdo pronto para divulgar.",
+    title: "Pegue o mostruário",
+    text: "Aprovada! Você vem até a loja, conhece a Carol e sai com ~50 peças no sistema de consignação — sem pagar nada antecipado.",
   },
   {
     number: "04",
-    title: "Primeiras vendas",
-    text: "Comece a vender para amigas, família e redes sociais — no seu ritmo, com nosso suporte.",
+    title: "Venda e faça o acerto",
+    text: "Você tem 30 dias para vender. Depois, vem até a loja, paga só o que vendeu, devolve o restante e pode renovar as peças.",
   },
 ]
 
@@ -37,7 +37,7 @@ export function ComoFunciona({ onOpenSofia }: ComoFuncionaProps) {
             Como funciona
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Do primeiro contato até a sua primeira venda, um caminho simples e guiado.
+            Do primeiro contato até a sua primeira venda, um caminho simples e sem risco.
           </p>
         </Reveal>
 

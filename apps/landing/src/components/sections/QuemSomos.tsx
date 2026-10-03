@@ -1,5 +1,5 @@
 import { BRAND } from "@tania-joias/shared"
-import { Banknote, Check, Gem, GraduationCap, Heart, HeartHandshake, Smartphone, Star } from "lucide-react"
+import { Banknote, Check, Gem, GraduationCap, Heart, HeartHandshake, RefreshCw, Smartphone, Star } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
 import { Button } from "@/components/ui/button"
@@ -15,33 +15,33 @@ const BENEFICIOS = [
     text: "Peças com acabamento impecável, garantia e coleções atuais que encantam suas clientes.",
   },
   {
-    icon: GraduationCap,
-    title: "Treinamento Completo",
-    text: "Mesmo sem experiência você aprende tudo para começar a vender.",
+    icon: RefreshCw,
+    title: "Consignação — Sem Risco",
+    text: "Você vende por 30 dias e faz o acerto só do que vendeu. Sem comprar estoque antecipado.",
   },
   {
-    icon: HeartHandshake,
-    title: "Suporte de Verdade",
-    text: "Nossa equipe acompanha você desde o primeiro atendimento.",
+    icon: GraduationCap,
+    title: "Treinamento Completo",
+    text: "Mesmo sem experiência, você aprende tudo o que precisa para começar a vender com confiança.",
   },
   {
     icon: Banknote,
-    title: "Excelente Margem de Lucro",
-    text: `Ganhe até ${BRAND.comissaoMaxima} de comissão revendendo produtos de alto valor percebido.`,
+    title: "De 30% a 50% de Comissão",
+    text: "Quanto mais você vende, maior a sua comissão. Você controla o seu ganho.",
   },
   {
     icon: Smartphone,
     title: "Venda do Seu Jeito",
-    text: "Venda presencialmente, pelo WhatsApp ou pelas redes sociais.",
+    text: "Presencialmente, pelo WhatsApp ou pelas redes sociais — você escolhe como chegar às suas clientes.",
   },
   {
-    icon: Heart,
-    title: "Empresa Consolidada",
-    text: "Uma marca que conquista clientes e ajuda centenas de mulheres a aumentar sua renda.",
+    icon: HeartHandshake,
+    title: "Suporte da Carol",
+    text: "A Carol acompanha cada vendedora de perto. Aqui você não está sozinha.",
   },
 ]
 
-const INDICADORES = ["Produtos Premium", "Suporte Especializado", "Atendimento local personalizado"]
+const INDICADORES = ["Consignação — sem risco", "Suporte especializado", "Atendimento regional personalizado"]
 
 export function QuemSomos({ onOpenSofia }: QuemSomosProps) {
   return (
@@ -52,16 +52,16 @@ export function QuemSomos({ onOpenSofia }: QuemSomosProps) {
             Quem é a {BRAND.nome}
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-            Na {BRAND.nome} acreditamos que toda mulher pode conquistar sua independência
-            financeira revendendo semijoias premium.
+            A {BRAND.nome} é um negócio pensado para a mulher trabalhadora que quer crescer e
+            conquistar mais renda sem abrir mão da sua rotina.
           </p>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Oferecemos produtos de alta qualidade, treinamento completo e suporte em todas as
-            etapas para que você venda com segurança, mesmo sem experiência.
+            Trabalhamos com consignação: você pega o mostruário de semijoias premium, vende em
+            30 dias e faz o acerto. Sem comprar estoque, sem risco — e com suporte da Carol em
+            cada etapa.
           </p>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Atendemos atualmente {BRAND.cidadesTexto}. Nossa área de atendimento pode ser ampliada conforme a logística da
-            empresa.
+            Atendemos atualmente {BRAND.cidadesTexto}.
           </p>
         </Reveal>
 
