@@ -1,5 +1,5 @@
 import { BRAND } from "@tania-joias/shared"
-import { Banknote, Check, Gem, GraduationCap, Heart, HeartHandshake, RefreshCw, Smartphone, Star } from "lucide-react"
+import { Banknote, Check, Gem, GraduationCap, HeartHandshake, RefreshCw, Smartphone, Star } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
 import { Button } from "@/components/ui/button"
