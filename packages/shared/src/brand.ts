@@ -6,8 +6,6 @@
  *
  * Regras que ficam no BANCO (Admin → Configurações), não aqui:
  * cidades atendidas, pesos/notas do IPR, flags de IA.
- *
- * ⚠️ Campos marcados com TODO ainda precisam da informação real da Carol.
  */
 
 export interface Depoimento {
@@ -52,15 +50,15 @@ export const BRAND = {
   /** Endereço público da landing (links da ficha apontam pra cá). */
   siteUrl: "https://www.rosesemijoias.com.br",
 
-  /** E-mail de contato (política de privacidade / LGPD). TODO */
-  emailContato: "TODO@gmail.com",
+  /** E-mail de contato (política de privacidade / LGPD) e notificações de candidatas. */
+  emailContato: "carolina.g.lamin@gmail.com",
 
-  instagramUrl: "https://www.instagram.com/TODO/", // TODO
-  endereco: "TODO: endereço da Rose Semi Jóias", // TODO
-  telefoneExibicao: "(11) 9TODO-0000", // TODO
-  telefoneTel: "+5511900000000", // TODO
+  instagramUrl: "https://www.instagram.com/rosesemijoiasoficial/",
+  endereco: "R. dos Bandeirantes, 729, Sala 05 — Vila Bocaina, Mauá/SP — CEP 09310-390",
+  telefoneExibicao: "(11) 97833-6965",
+  telefoneTel: "+5511978336965",
 
-  /** Faixas de ganho exibidas em "Quanto posso ganhar". TODO: validar com a Carol. */
+  /** Faixas de ganho exibidas em "Quanto posso ganhar". */
   faixasGanho: [
     { label: "Começando", horas: "1 hora por dia", faixa: "R$ 300 – R$ 600 /mês", descricao: "Vendendo para amigas e família, divulgando nas suas redes.", destaque: false },
     { label: "Consistente", horas: "2 a 3 horas por dia", faixa: "R$ 800 – R$ 1.800 /mês", descricao: "Com uma carteira de clientes fiéis e divulgação regular.", destaque: true },
