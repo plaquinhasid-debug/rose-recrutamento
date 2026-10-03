@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { CheckCircle2, Clock, HeartHandshake, Instagram } from "lucide-react"
@@ -12,7 +13,7 @@ import {
   SOFIA_REPROVADA_FINAL_LINES,
 } from "@/data/sofia-script"
 
-const INSTAGRAM_URL = "https://www.instagram.com/taniajoias_/"
+const INSTAGRAM_URL = BRAND.instagramUrl
 
 interface ResultScreenProps {
   result: FinalizeCandidateResponse

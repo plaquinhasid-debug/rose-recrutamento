@@ -35,10 +35,10 @@ export const LEAD_STATUS_COLOR: Record<LeadStatus, string> = {
 // `whatsapp_messages`, exibido à parte no card — não deste rótulo.
 export const ETAPA_POS_APROVACAO_LABEL: Record<EtapaPosAprovacao, string> = {
   contatada: "Contato manual / Ficha pendente",
-  confirmada: "Confirmada",
+  confirmada: "Ficha recebida",
   aguardando_tania: `Aguardando aprovação da ${BRAND.dona}`,
-  ativa: "Ativa",
-  desistiu: "Desistiu",
+  ativa: "Ativa (pegou a maleta)",
+  desistiu: "Desistiu / não aprovada",
 }
 
 export const ETAPA_POS_APROVACAO_COLOR: Record<EtapaPosAprovacao, string> = {
@@ -141,36 +141,31 @@ export interface PipelineColumn {
   groupKeys?: PipelineColumnKey[]
 }
 
+// Rose: CRM enxuto com 5 colunas. Os valores reais do banco continuam os
+// mesmos (status + etapa_pos_aprovacao); só a exibição agrupa.
 export const PIPELINE_COLUMNS: PipelineColumn[] = [
   {
     key: "novo",
-    label: "Novo Lead",
+    label: "Novas candidatas",
     color: LEAD_STATUS_COLOR.novo,
     groupKeys: ["em_analise"],
   },
-  // IMPLEMENTATION-CRM-003A — rótulo só desta coluna do Kanban, não do status
-  // real: `status='aprovada'` sem `etapa_pos_aprovacao` significa "passou na
-  // 1ª qualificação, falta gerar a Ficha", não "processo concluído". O valor
-  // interno do enum e `LEAD_STATUS_LABEL.aprovada` (badge, filtros) continuam
-  // "Aprovada" — só a etiqueta do card muda, pra deixar a próxima ação óbvia.
-  { key: "aprovada", label: "Pré-aprovada / Gerar ficha", color: LEAD_STATUS_COLOR.aprovada },
-  // IMPLEMENTATION-CRM-005B — mesmo padrão da coluna "aprovada" acima: rótulo
-  // só do Kanban, decolado de `ETAPA_POS_APROVACAO_LABEL.contatada` (que
-  // continua "Contato manual / Ficha pendente" pra quem lê a etapa fora do
-  // board, ex. `LeadDetailDrawer.tsx`). "Contato manual" deixou de descrever
-  // bem essa coluna depois do botão rastreado (`useSendFichaWhatsapp`) — boa
-  // parte dos casos aqui não é mais contato manual.
-  { key: "contatada", label: "Ficha pendente", color: ETAPA_POS_APROVACAO_COLOR.contatada },
+  {
+    key: "contatada",
+    label: "Pré-aprovada · enviar ficha",
+    color: ETAPA_POS_APROVACAO_COLOR.contatada,
+    groupKeys: ["aprovada"],
+  },
   {
     key: "confirmada",
-    label: `Aguardando aprovação da ${BRAND.dona}`,
+    label: `Ficha recebida · ${BRAND.dona} decide`,
     color: ETAPA_POS_APROVACAO_COLOR.aguardando_tania,
     groupKeys: ["aguardando_tania"],
   },
-  { key: "ativa", label: ETAPA_POS_APROVACAO_LABEL.ativa, color: ETAPA_POS_APROVACAO_COLOR.ativa },
+  { key: "ativa", label: "Ativa · pegou a maleta", color: ETAPA_POS_APROVACAO_COLOR.ativa },
   {
     key: "desistiu",
-    label: "Não aprovada",
+    label: "Não seguiu",
     color: ETAPA_POS_APROVACAO_COLOR.desistiu,
     groupKeys: ["reprovada"],
   },
@@ -182,9 +177,9 @@ export const PIPELINE_COLUMNS: PipelineColumn[] = [
  * informação não se perde, só sai da largura de uma coluna inteira.
  */
 export const ETAPA_DETALHE_LABEL: Partial<Record<PipelineColumnKey, string>> = {
-  em_analise: "Em análise pela Sofia",
-  aguardando_tania: "Mensagem enviada, aguardando resposta",
-  reprovada: "Reprovada pelo sistema",
+  em_analise: "Em análise",
+  aprovada: "Ficha ainda não gerada",
+  reprovada: "Não passou na pré-qualificação",
 }
 
 interface LeadForPipeline {

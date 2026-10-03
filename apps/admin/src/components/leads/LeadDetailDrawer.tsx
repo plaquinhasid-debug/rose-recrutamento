@@ -1,29 +1,19 @@
 import * as React from "react"
 import { toast } from "sonner"
-import { AlertCircle, CheckCircle2, Loader2, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle2, Instagram, Loader2, MessageCircle, XCircle } from "lucide-react"
 import { ETAPA_POS_APROVACAO_LABEL } from "@tania-joias/shared"
 
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
-import { FichaAprovacaoSection } from "@/components/leads/FichaAprovacaoSection"
-import { TaniaAprovacaoSection } from "@/components/leads/TaniaAprovacaoSection"
+import { RoseFichaSection } from "@/components/leads/RoseFichaSection"
 import { LeadStatusBadge } from "@/components/leads/LeadStatusBadge"
-import { PerfilComercialBadge } from "@/components/leads/PerfilComercialBadge"
 import { IprBreakdown } from "@/components/leads/IprBreakdown"
-import { SofiaAnalysisCard } from "@/components/leads/SofiaAnalysisCard"
-import { useLead, useLeadAnalysis, useLeadAnswers, useUpdateLead } from "@/hooks/useLeadDetail"
-import { formatDateTime, formatPhone } from "@/lib/format"
+import { useLead, useLeadAnalysis, useUpdateLead } from "@/hooks/useLeadDetail"
+import { formatDateTime, formatInstagram, formatPhone, whatsappLinkWithMessage } from "@/lib/format"
+import { mensagemFalarComCandidata } from "@/lib/taniaFalarComCandidata"
 import type { IprBreakdown as IprBreakdownType } from "@/types"
 
 interface LeadDetailDrawerProps {
@@ -31,61 +21,45 @@ interface LeadDetailDrawerProps {
   onOpenChange: (open: boolean) => void
 }
 
-// QUALIFICACAO-002, Parte 1 — apresentação simples e neutra (nunca "boa/má
-// candidata", "risco alto/baixo" etc.), só a regularidade autodeclarada.
-const ESTABILIDADE_PROFISSIONAL_LABEL: Record<string, string> = {
-  ALTA: "Alta",
-  MEDIA: "Média",
-  BAIXA: "Baixa",
+function Linha({ label, value }: { label: string; value: React.ReactNode }) {
+  if (value === null || value === undefined || value === "") return null
+  return (
+    <div className="flex justify-between gap-4 border-b border-border/60 py-1.5 text-sm last:border-0">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-right font-medium text-foreground">{value}</span>
+    </div>
+  )
+}
+
+function instagramUrl(handle: string): string {
+  const limpo = handle.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "")
+  return `https://www.instagram.com/${limpo}/`
 }
 
 export function LeadDetailDrawer({ leadId, onOpenChange }: LeadDetailDrawerProps) {
   const open = Boolean(leadId)
   const { data: lead, isLoading: leadLoading, isError: leadError } = useLead(leadId ?? undefined)
-  const { data: answers, isLoading: answersLoading } = useLeadAnswers(leadId ?? undefined)
   const { data: analysis, isLoading: analysisLoading } = useLeadAnalysis(leadId ?? undefined)
   const updateLead = useUpdateLead()
 
   const [observacoes, setObservacoes] = React.useState("")
-
   React.useEffect(() => {
     setObservacoes(lead?.observacoes ?? "")
   }, [lead?.id, lead?.observacoes])
-
   const observacoesDirty = (lead?.observacoes ?? "") !== observacoes
 
-  // Mesmo resumo que a Sofia já escreveu sobre a candidata, reaproveitado na
-  // mensagem final pra Tania — cai no resumo determinístico se a análise
-  // expandida não estiver disponível.
-  const resumoParaMensagem = analysis?.resumo_comercial || lead?.resumo_ia || ""
-
-  async function handleStatusChange(status: "aprovada" | "reprovada") {
+  async function handlePreQualificacao(status: "aprovada" | "reprovada") {
     if (!lead) return
     try {
       await updateLead.mutateAsync({
         id: lead.id,
-        patch: { status },
+        patch: { status, whatsapp: true },
         previousStatus: lead.status,
-        leadWhatsapp: lead.whatsapp,
+        leadWhatsapp: true,
       })
-      toast.success(status === "aprovada" ? "Lead aprovada." : "Lead reprovada.")
+      toast.success(status === "aprovada" ? "Pré-aprovada! O link da ficha foi gerado." : "Marcada como não seguiu.")
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Não foi possível atualizar o status.")
-    }
-  }
-
-  // RFC-INTELLIGENCE-006 — WhatsApp é obrigatório para aprovar (gate em
-  // `useUpdateLead`, ver comentário de `leadWhatsapp` em `useLeadDetail.ts`).
-  // Esta é a única forma de corrigir/confirmar o campo pelo Admin — sem
-  // isso, uma lead com `whatsapp` false/nulo por engano (ou desatualizado)
-  // ficaria travada sem nenhum caminho pra equipe liberar manualmente.
-  async function handleConfirmWhatsapp() {
-    if (!lead) return
-    try {
-      await updateLead.mutateAsync({ id: lead.id, patch: { whatsapp: true } })
-      toast.success("WhatsApp confirmado.")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Não foi possível confirmar o WhatsApp.")
+      toast.error(err instanceof Error ? err.message : "Não foi possível atualizar.")
     }
   }
 
@@ -99,28 +73,23 @@ export function LeadDetailDrawer({ leadId, onOpenChange }: LeadDetailDrawerProps
     }
   }
 
+  const linkWhatsapp = lead ? whatsappLinkWithMessage(lead.telefone, mensagemFalarComCandidata(lead.nome)) : null
+  const emPreQualificacao = lead?.status === "novo" || lead?.status === "em_analise"
+
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onOpenChange(false)}>
       <SheetContent className="w-full sm:max-w-xl">
         {leadLoading ? (
           <div className="space-y-4 p-6">
-            <SheetTitle className="sr-only">Carregando detalhes do lead</SheetTitle>
+            <SheetTitle className="sr-only">Carregando</SheetTitle>
             <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-4 w-full" />
             <Skeleton className="h-32 w-full" />
           </div>
         ) : leadError || !lead ? (
-          // IMPLEMENTATION-CRM-004B (item 2) — deep link pra um lead que não
-          // existe (ou não é mais acessível) nunca pode travar o Admin numa
-          // tela de carregamento infinita. Erro amigável + fechar continua
-          // usável (o resto do Kanban/lista por trás não é afetado).
           <div className="flex flex-col items-center gap-3 p-6 text-center">
             <SheetTitle className="sr-only">Candidata não encontrada</SheetTitle>
             <AlertCircle className="size-8 text-muted-foreground" />
             <p className="text-sm font-medium text-foreground">Candidata não encontrada</p>
-            <p className="text-sm text-muted-foreground">
-              Esse link pode estar desatualizado, ou a candidata pode ter sido removida.
-            </p>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Fechar
             </Button>
@@ -133,55 +102,64 @@ export function LeadDetailDrawer({ leadId, onOpenChange }: LeadDetailDrawerProps
                 <LeadStatusBadge status={lead.status} />
               </div>
               <SheetDescription>
-                {formatPhone(lead.telefone)} · {lead.cidade ?? "Cidade não informada"} ·
-                Cadastrada em {formatDateTime(lead.created_at)}
+                {formatPhone(lead.telefone)} · {lead.cidade ?? "Cidade não informada"} · Chegou em{" "}
+                {formatDateTime(lead.created_at)}
               </SheetDescription>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {linkWhatsapp && (
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={linkWhatsapp} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="size-4" />
+                      Chamar no WhatsApp
+                    </a>
+                  </Button>
+                )}
+                {lead.instagram && (
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={instagramUrl(lead.instagram)} target="_blank" rel="noopener noreferrer">
+                      <Instagram className="size-4" />
+                      Ver Instagram
+                    </a>
+                  </Button>
+                )}
+              </div>
             </SheetHeader>
 
             <div className="flex-1 space-y-6 overflow-y-auto px-6 py-4">
-              {analysisLoading ? (
-                <Skeleton className="h-48 w-full" />
-              ) : (
-                <SofiaAnalysisCard analysis={analysis} />
+              <section>
+                <h3 className="mb-1 text-sm font-semibold text-foreground">Sobre ela</h3>
+                <Linha label="Idade" value={lead.idade} />
+                <Linha label="Trabalha" value={lead.trabalha ? "Sim" : "Não"} />
+                <Linha label="Profissão" value={lead.profissao} />
+                <Linha label="Onde trabalha" value={lead.empresa_atual} />
+                <Linha
+                  label="Já vendeu antes"
+                  value={lead.experiencia_vendas === null ? null : lead.experiencia_vendas ? "Sim" : "Não"}
+                />
+                <Linha label="Instagram" value={lead.instagram ? formatInstagram(lead.instagram) : "Não informou"} />
+                <Linha
+                  label="Etapa"
+                  value={lead.etapa_pos_aprovacao ? ETAPA_POS_APROVACAO_LABEL[lead.etapa_pos_aprovacao] : null}
+                />
+                <Linha label="Origem" value={lead.utm_campaign || lead.origem} />
+                {lead.objetivo && (
+                  <p className="mt-3 rounded-lg bg-secondary/60 p-3 text-sm italic text-foreground">“{lead.objetivo}”</p>
+                )}
+              </section>
+
+              {lead.status === "aprovada" && (
+                <>
+                  <Separator />
+                  <RoseFichaSection lead={lead} />
+                </>
               )}
 
               <Separator />
 
               <section>
-                <h3 className="mb-2 text-sm font-semibold text-foreground">Perfil comercial</h3>
-                <div className="flex items-center gap-2">
-                  <PerfilComercialBadge perfil={lead.perfil_comercial} />
-                </div>
+                <h3 className="mb-3 text-sm font-semibold text-foreground">Pontuação (IPR)</h3>
                 {analysisLoading ? (
-                  <Skeleton className="mt-2 h-4 w-3/4" />
-                ) : (
-                  analysis?.perfil_motivo && (
-                    <p className="mt-2 text-sm text-muted-foreground">{analysis.perfil_motivo}</p>
-                  )
-                )}
-              </section>
-
-              <Separator />
-
-              <section>
-                <h3 className="mb-2 text-sm font-semibold text-foreground">Resumo da IA</h3>
-                {analysisLoading ? (
-                  <Skeleton className="h-16 w-full" />
-                ) : (
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {lead.resumo_ia || analysis?.resumo || "Nenhum resumo disponível."}
-                  </p>
-                )}
-              </section>
-
-              <Separator />
-
-              <section>
-                <h3 className="mb-3 text-sm font-semibold text-foreground">
-                  Índice de Potencial da Revendedora
-                </h3>
-                {analysisLoading ? (
-                  <Skeleton className="h-40 w-full" />
+                  <Skeleton className="h-32 w-full" />
                 ) : (
                   <IprBreakdown
                     score={lead.ipr}
@@ -193,126 +171,12 @@ export function LeadDetailDrawer({ leadId, onOpenChange }: LeadDetailDrawerProps
               <Separator />
 
               <section>
-                <h3 className="mb-2 text-sm font-semibold text-foreground">
-                  Estabilidade profissional
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {ESTABILIDADE_PROFISSIONAL_LABEL[lead.estabilidade_profissional ?? ""] ??
-                    "Não informada"}
-                </p>
-              </section>
-
-              {lead.status === "aprovada" && (
-                <>
-                  <Separator />
-                  <section>
-                    <h3 className="mb-2 text-sm font-semibold text-foreground">
-                      Etapa pós-aprovação
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {lead.etapa_pos_aprovacao
-                        ? ETAPA_POS_APROVACAO_LABEL[lead.etapa_pos_aprovacao]
-                        : "Aprovada — ainda não avançou (mova no Kanban)"}
-                    </p>
-                  </section>
-
-                  <Separator />
-
-                  <FichaAprovacaoSection leadId={lead.id} leadWhatsapp={lead.whatsapp} />
-
-                  {(lead.etapa_pos_aprovacao === "confirmada" ||
-                    lead.etapa_pos_aprovacao === "aguardando_tania") && (
-                    <>
-                      <Separator />
-                      <TaniaAprovacaoSection
-                        leadId={lead.id}
-                        leadNome={lead.nome}
-                        leadCidade={lead.cidade}
-                        leadTelefone={lead.telefone}
-                        leadEtapa={lead.etapa_pos_aprovacao}
-                        leadPerfilComercial={lead.perfil_comercial}
-                        resumoParaMensagem={resumoParaMensagem}
-                      />
-                    </>
-                  )}
-                </>
-              )}
-
-              <Separator />
-
-              <section>
-                <h3 className="mb-2 text-sm font-semibold text-foreground">
-                  Histórico de respostas
-                </h3>
-                {answersLoading ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                  </div>
-                ) : answers && answers.length > 0 ? (
-                  <ul className="space-y-3">
-                    {answers.map((answer) => (
-                      <li key={answer.id} className="rounded-lg border border-border p-3">
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                          {answer.question_label}
-                        </p>
-                        <p className="mt-1 text-sm text-foreground">
-                          {answer.answer_value || "—"}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Nenhuma resposta registrada para esta candidata.
-                  </p>
-                )}
-              </section>
-
-              <Separator />
-
-              <section>
-                <h3 className="mb-2 text-sm font-semibold text-foreground">WhatsApp</h3>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className={
-                      lead.whatsapp === true
-                        ? "border-success/40 text-success"
-                        : "border-warning/40 text-warning"
-                    }
-                  >
-                    {lead.whatsapp === true ? "Confirmado" : "Não confirmado"}
-                  </Badge>
-                  {lead.whatsapp !== true && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={updateLead.isPending}
-                      onClick={() => void handleConfirmWhatsapp()}
-                    >
-                      Confirmar WhatsApp
-                    </Button>
-                  )}
-                </div>
-                {lead.whatsapp !== true && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    A candidata respondeu que não tem WhatsApp nesse número (ou não informou).
-                    WhatsApp é obrigatório — confirme antes de aprovar.
-                  </p>
-                )}
-              </section>
-
-              <Separator />
-
-              <section>
                 <h3 className="mb-2 text-sm font-semibold text-foreground">Observações</h3>
                 <Textarea
                   value={observacoes}
                   onChange={(e) => setObservacoes(e.target.value)}
                   placeholder="Anotações internas sobre esta candidata..."
-                  rows={4}
+                  rows={3}
                 />
                 {observacoesDirty && (
                   <Button
@@ -328,27 +192,28 @@ export function LeadDetailDrawer({ leadId, onOpenChange }: LeadDetailDrawerProps
               </section>
             </div>
 
-            <SheetFooter className="flex-row flex-wrap gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 border-success/40 text-success hover:bg-success/10"
-                disabled={updateLead.isPending || lead.status === "aprovada" || lead.whatsapp !== true}
-                title={lead.whatsapp !== true ? "Confirme que a candidata possui WhatsApp antes de aprová-la." : undefined}
-                onClick={() => void handleStatusChange("aprovada")}
-              >
-                <CheckCircle2 className="size-4" />
-                Aprovar
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 border-destructive/40 text-destructive hover:bg-destructive/10"
-                disabled={updateLead.isPending || lead.status === "reprovada"}
-                onClick={() => void handleStatusChange("reprovada")}
-              >
-                <XCircle className="size-4" />
-                Reprovar
-              </Button>
-            </SheetFooter>
+            {emPreQualificacao && (
+              <SheetFooter className="flex-row flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 border-success/40 text-success hover:bg-success/10"
+                  disabled={updateLead.isPending}
+                  onClick={() => void handlePreQualificacao("aprovada")}
+                >
+                  <CheckCircle2 className="size-4" />
+                  Pré-aprovar (gerar ficha)
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 border-destructive/40 text-destructive hover:bg-destructive/10"
+                  disabled={updateLead.isPending}
+                  onClick={() => void handlePreQualificacao("reprovada")}
+                >
+                  <XCircle className="size-4" />
+                  Não seguir
+                </Button>
+              </SheetFooter>
+            )}
           </>
         )}
       </SheetContent>

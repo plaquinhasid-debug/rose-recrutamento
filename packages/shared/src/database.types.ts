@@ -229,6 +229,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          ativada_em: string | null
           campanha: string | null
           cidade: string | null
           client_ip: string | null
@@ -274,6 +275,7 @@ export type Database = {
           whatsapp_automatico_enviado_em: string | null
         }
         Insert: {
+          ativada_em?: string | null
           campanha?: string | null
           cidade?: string | null
           client_ip?: string | null
@@ -319,6 +321,7 @@ export type Database = {
           whatsapp_automatico_enviado_em?: string | null
         }
         Update: {
+          ativada_em?: string | null
           campanha?: string | null
           cidade?: string | null
           client_ip?: string | null

@@ -118,8 +118,8 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle>Cidades atendidas</CardTitle>
             <CardDescription>
-              Restrinja a captação de novas revendedoras às cidades cadastradas abaixo. Quando
-              desativado, a Landing Page aceita candidatas de qualquer cidade.
+              Candidatas destas cidades ganham os pontos de "cidade atendida". Candidatas de outras
+              cidades continuam podendo se cadastrar, só não ganham esses pontos.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -133,9 +133,9 @@ export default function SettingsPage() {
               <>
                 <div className="flex items-center justify-between rounded-lg border border-border p-4">
                   <div>
-                    <Label htmlFor="restringir-cidade">Restringir por cidade</Label>
+                    <Label htmlFor="restringir-cidade">Pontuar só as cidades da lista</Label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Quando ativo, apenas candidatas das cidades da lista são aceitas.
+                      Quando desligado, todas as cidades ganham os pontos.
                     </p>
                   </div>
                   <Switch id="restringir-cidade" checked={restringir} onCheckedChange={setRestringir} />

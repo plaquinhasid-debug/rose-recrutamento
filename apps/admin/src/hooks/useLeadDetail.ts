@@ -123,48 +123,20 @@ export function useUpdateLead() {
     onSuccess: (data, variables) => {
       queryClient.setQueryData(["lead", data.id], data)
       void queryClient.invalidateQueries({ queryKey: ["leads"] })
-      void queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] })
-      void queryClient.invalidateQueries({ queryKey: ["reports"] })
 
-      // Só dispara quando ESTA atualização é a que aprova a lead — não quando
-      // ela já estava aprovada e só a etapa pós-aprovação mudou (arrastar
-      // entre Contatada/Confirmada/Ativa/Desistiu não pode reenviar o evento).
+      // Pré-aprovação manual: avisa o Meta (otimização dos anúncios) e já
+      // gera o link da ficha pra Carol/Ana enviarem pelo WhatsApp.
       if (variables.patch.status === "aprovada" && variables.previousStatus !== "aprovada") {
-        // Avisa o Meta Conversions API sobre a aprovação manual (a lead pode
-        // ter caído em "análise" e só sido aprovada dias depois pela equipe,
-        // quando o Pixel do navegador já não está mais disponível). Fire-and-
-        // -forget: nunca deve travar a UI do Admin.
         supabase.functions
           .invoke("send-meta-lead-event", { body: { lead_id: data.id } })
           .then(({ error }) => {
             if (error) console.warn("[meta] falha ao enviar evento Lead", error)
           })
 
-        // Mesma lógica pro WhatsApp automático de aprovação — cobre o caso de
-        // aprovação manual (a Sofia só dispara isso sozinha quando a IPR
-        // aprova na hora, em `finalize-candidate`). Best-effort e idempotente
-        // (a Edge Function checa a flag e `whatsapp_automatico_enviado_em`).
-        supabase.functions
-          .invoke("send-whatsapp-approval", { body: { lead_id: data.id } })
-          .then(({ error }) => {
-            if (error) console.warn("[whatsapp] falha ao enviar aprovação", error)
-          })
-
-        // Gera o link da Ficha de Aprovação sozinho — a equipe não precisa
-        // mais lembrar de clicar em "Gerar link da Ficha" depois de aprovar.
         generateFichaLink(data.id)
           .then(() => {
             void queryClient.invalidateQueries({ queryKey: ["lead-ficha", data.id] })
-
-            // Mesma lógica pro envio automático do link por WhatsApp — cobre
-            // o caso de aprovação manual (a Sofia só dispara isso sozinha na
-            // hora em `finalize-candidate`). Best-effort e idempotente (a
-            // Edge Function checa a flag e `whatsapp_enviado_em`).
-            supabase.functions
-              .invoke("send-whatsapp-ficha", { body: { lead_id: data.id } })
-              .then(({ error }) => {
-                if (error) console.warn("[whatsapp] falha ao enviar link da Ficha", error)
-              })
+            void queryClient.invalidateQueries({ queryKey: ["leads"] })
           })
           .catch((err) => console.warn("[ficha] falha ao gerar link automaticamente", err))
       }

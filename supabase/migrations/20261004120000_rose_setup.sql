@@ -78,3 +78,27 @@ begin
   end if;
 end
 $$;
+
+-- 5) Data em que a revendedora virou "Ativa" (pegou a maleta) — base do
+--    número "Ativas no mês" e do custo por revendedora ativa.
+alter table public.leads add column if not exists ativada_em timestamptz null;
+
+create or replace function public.rose_marca_ativada_em()
+returns trigger
+language plpgsql
+as $$
+begin
+  if new.etapa_pos_aprovacao = 'ativa'
+     and (old.etapa_pos_aprovacao is distinct from 'ativa') then
+    new.ativada_em := now();
+  elsif new.etapa_pos_aprovacao is distinct from 'ativa' then
+    new.ativada_em := null;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists rose_marca_ativada_em on public.leads;
+create trigger rose_marca_ativada_em
+  before update of etapa_pos_aprovacao on public.leads
+  for each row execute function public.rose_marca_ativada_em();

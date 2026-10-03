@@ -49,6 +49,9 @@ export const BRAND = {
   /** Botões de profissão na conversa (as preferidas da Carol). A candidata também pode digitar outra. */
   profissoesSugeridas: ["Professora", "Enfermeira / Técnica de enfermagem", "Trabalho em clínica ou hospital", "Cabeleireira", "Esteticista"],
 
+  /** Endereço público da landing (links da ficha apontam pra cá). */
+  siteUrl: "https://www.rosesemijoias.com.br",
+
   /** E-mail de contato (política de privacidade / LGPD). TODO */
   emailContato: "TODO@gmail.com",
 

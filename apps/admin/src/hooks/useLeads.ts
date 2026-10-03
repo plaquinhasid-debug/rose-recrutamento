@@ -2,12 +2,6 @@ import { useQuery } from "@tanstack/react-query"
 import type { ProximaAcao } from "@tania-joias/shared"
 
 import { supabase } from "@/lib/supabase"
-import {
-  deriveTaniaNotificationStatus,
-  deriveWhatsappDeliveryStatus,
-  type TaniaNotificationStatus,
-  type WhatsappDeliveryStatus,
-} from "@/lib/whatsappStatus"
 import type { Lead, LeadFiltersState } from "@/types"
 
 export const DEFAULT_LEAD_FILTERS: LeadFiltersState = {
@@ -31,22 +25,6 @@ export type LeadWithAnalysis = Lead & {
     whatsapp_enviado_em: string | null
     contato_manual_em: string | null
   }[]
-  // IMPLEMENTATION-CRM-002A — status real de entrega (015B), correlacionado
-  // por lead_id (ver comentário de `deriveWhatsappDeliveryStatus`).
-  // IMPLEMENTATION-CRM-004B — inclui `message_purpose` pra poder isolar
-  // Ficha de notificação da Tania na mesma lista.
-  whatsapp_messages: {
-    meta_message_id: string
-    message_type: string | null
-    message_purpose: string | null
-    sent_at: string | null
-    delivered_at: string | null
-    read_at: string | null
-    failed_at: string | null
-    error_code: string | null
-    error_title: string | null
-    created_at: string
-  }[]
 }
 
 /** Uma lead pode ter mais de uma `ai_analysis` (reprocessamento) — a mais recente é a que vale. */
@@ -69,29 +47,7 @@ export function fichaPendente(lead: LeadWithAnalysis): LeadWithAnalysis["leads_f
   return ficha
 }
 
-/** Status real de entrega do WhatsApp da Ficha desta lead — nunca inventado, ver `deriveWhatsappDeliveryStatus`. */
-export function whatsappDeliveryStatusForLead(lead: LeadWithAnalysis): WhatsappDeliveryStatus {
-  const ficha = lead.leads_ficha[0]
-  return deriveWhatsappDeliveryStatus({
-    whatsappEnviadoEm: ficha?.whatsapp_enviado_em ?? null,
-    messages: lead.whatsapp_messages,
-  })
-}
 
-/**
- * IMPLEMENTATION-CRM-004B (item 9/22) — status da notificação automática
- * pra Tania, isolado do status da Ficha (nunca lê `whatsapp_messages` sem
- * filtrar por `message_purpose = 'NOTIFICACAO_TANIA'`, ver
- * `deriveTaniaNotificationStatus`). Hoje sempre devolve `"not_sent"` na
- * prática — o template ainda não existe, então `tania_notificada_em` nunca
- * é preenchido e nenhuma mensagem desse propósito é gravada.
- */
-export function taniaNotificationStatusForLead(lead: LeadWithAnalysis): TaniaNotificationStatus {
-  return deriveTaniaNotificationStatus({
-    taniaNotificadaEm: lead.tania_notificada_em,
-    messages: lead.whatsapp_messages,
-  })
-}
 
 async function fetchLeads(filters: LeadFiltersState): Promise<LeadWithAnalysis[]> {
   // IMPLEMENTATION-CRM-002A — string do select precisa ser um literal único
@@ -101,7 +57,7 @@ async function fetchLeads(filters: LeadFiltersState): Promise<LeadWithAnalysis[]
   let query = supabase
     .from("leads")
     .select(
-      "*, ai_analysis(proxima_acao, created_at), leads_ficha(id, token, criado_em, preenchido_em, whatsapp_enviado_em, contato_manual_em), whatsapp_messages!whatsapp_messages_lead_id_fkey(meta_message_id, message_type, message_purpose, sent_at, delivered_at, read_at, failed_at, error_code, error_title, created_at)",
+      "*, ai_analysis(proxima_acao, created_at), leads_ficha(id, token, criado_em, preenchido_em, whatsapp_enviado_em, contato_manual_em)",
     )
     .order("created_at", { ascending: false })
 
