@@ -1,0 +1,152 @@
+# Supabase CLI — configuração SOMENTE para ambiente LOCAL/DESCARTÁVEL (M0-B).
+#
+# Não contém nenhum segredo, chave, senha ou connection string, e NÃO aponta
+# para produção. O vínculo com o projeto de produção vive só em
+# supabase/.temp/ (não versionado) e não deve ser usado para `db push` — ver
+# docs/m0/M0-B-reprodutibilidade-banco.md.
+#
+# ATENÇÃO (M0-B.1): a M0-C NÃO usa `supabase start` / `supabase db reset`.
+# O replay é feito num container Postgres com `--network none` (fail-closed),
+# ver docs/m0/M0-C-procedimento-fail-closed.md. Este arquivo existe para uso
+# local futuro e para registrar o verify_jwt de cada função.
+
+project_id = "tania-joias-recrutamento-local"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+# Produção roda Postgres 17.6 (consultado em 2026-10-03).
+major_version = 17
+
+[db.pooler]
+enabled = false
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+# Sem seed de dados: os seeds técnicos (settings, campanha "organico") já vêm
+# das próprias migrations. Nunca copiar dados reais de candidatas para cá.
+enabled = false
+
+[realtime]
+enabled = true
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+# Admin local (apps/admin, Vite) roda na 5174; Landing (apps/landing) na 5173.
+site_url = "http://127.0.0.1:5174"
+additional_redirect_urls = [
+  "http://localhost:5174",
+  "http://127.0.0.1:5174",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+]
+jwt_expiry = 3600
+# A configuração de Auth de PRODUÇÃO (signup, templates, SMTP, URLs) não está
+# versionada e é NÃO DETERMINADA — ver docs/m0/M0-B-reprodutibilidade-banco.md.
+# Os valores abaixo são defaults locais, não espelho de produção.
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+
+[analytics]
+enabled = false
+
+# verify_jwt por Edge Function, espelhando o que está PUBLICADO em produção
+# (list_edge_functions, 2026-10-03). `swift-action` existe só em produção e
+# não está no repositório — intencionalmente ausente aqui.
+[functions.agent-ai-gateway]
+verify_jwt = false
+
+[functions.confirm-primeiro-mostruario]
+verify_jwt = true
+
+[functions.create-ambassador-invite]
+verify_jwt = true
+
+[functions.daily-leads-report]
+verify_jwt = false
+
+[functions.finalize-candidate]
+verify_jwt = false
+
+[functions.get-ficha]
+verify_jwt = false
+
+[functions.get-my-embaixadora]
+verify_jwt = true
+
+[functions.get-my-indicacoes]
+verify_jwt = true
+
+[functions.invalidate-indicacao]
+verify_jwt = true
+
+[functions.knowledge-service]
+verify_jwt = true
+
+[functions.list-ambassadors-admin]
+verify_jwt = true
+
+[functions.list-indicacoes-admin]
+verify_jwt = true
+
+[functions.redeem-ambassador-invite]
+verify_jwt = false
+
+[functions.resend-ambassador-invite]
+verify_jwt = true
+
+[functions.send-lembretes-ficha]
+verify_jwt = false
+
+[functions.send-meta-lead-event]
+verify_jwt = true
+
+[functions.send-whatsapp-approval]
+verify_jwt = false
+
+[functions.send-whatsapp-ficha]
+verify_jwt = false
+
+[functions.sofia-config]
+verify_jwt = true
+
+[functions.sofia-reagir]
+verify_jwt = false
+
+[functions.submit-ficha]
+verify_jwt = false
+
+[functions.update-recompensa-status]
+verify_jwt = true
+
+[functions.validate-ambassador-invite]
+verify_jwt = false
