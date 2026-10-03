@@ -1,3 +1,4 @@
+import { BRAND } from "./brand"
 import type { Enums } from "./database.types"
 
 export type LeadStatus = Enums<"lead_status">
@@ -35,7 +36,7 @@ export const LEAD_STATUS_COLOR: Record<LeadStatus, string> = {
 export const ETAPA_POS_APROVACAO_LABEL: Record<EtapaPosAprovacao, string> = {
   contatada: "Contato manual / Ficha pendente",
   confirmada: "Confirmada",
-  aguardando_tania: "Aguardando aprovação da Tania",
+  aguardando_tania: `Aguardando aprovação da ${BRAND.dona}`,
   ativa: "Ativa",
   desistiu: "Desistiu",
 }
@@ -162,7 +163,7 @@ export const PIPELINE_COLUMNS: PipelineColumn[] = [
   { key: "contatada", label: "Ficha pendente", color: ETAPA_POS_APROVACAO_COLOR.contatada },
   {
     key: "confirmada",
-    label: "Aguardando aprovação da Tania",
+    label: `Aguardando aprovação da ${BRAND.dona}`,
     color: ETAPA_POS_APROVACAO_COLOR.aguardando_tania,
     groupKeys: ["aguardando_tania"],
   },

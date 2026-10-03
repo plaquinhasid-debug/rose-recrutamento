@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import * as React from "react"
 import { Outlet, useLocation } from "react-router-dom"
 
@@ -19,7 +20,7 @@ function titleForPath(pathname: string): string {
   const match = Object.keys(TITLES).find(
     (key) => key !== "/" && pathname.startsWith(key),
   )
-  return match ? TITLES[match] : "Tania Joias"
+  return match ? TITLES[match] : `${BRAND.nome}`
 }
 
 export function AppLayout() {

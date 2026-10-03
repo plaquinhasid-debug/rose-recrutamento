@@ -5,7 +5,7 @@
  * a próxima etapa com base nas respostas já dadas (função `skip`).
  */
 import { z } from "zod"
-import { identificacaoSchema, qualificacaoSchema } from "@tania-joias/shared"
+import { BRAND, identificacaoSchema, qualificacaoSchema } from "@tania-joias/shared"
 
 import type { SofiaAnswerKey, SofiaAnswers } from "@/types/sofia"
 
@@ -15,7 +15,7 @@ import type { SofiaAnswerKey, SofiaAnswers } from "@/types/sofia"
 // hesitação inicial.
 export const SOFIA_INTRO_LINES = [
   "Olá 🌸",
-  "Sou a Sofia, assistente virtual da Tania Joias.",
+  `Sou a ${BRAND.assistente}, assistente virtual da ${BRAND.nome}.`,
   "Vou te fazer só algumas perguntas rápidas pra ver se você já pode começar a vender com a gente — sem compromisso.",
   "Leva menos de 2 minutos.",
 ] as const
@@ -52,7 +52,7 @@ export const SOFIA_EM_ANALISE_LINES = [
 export const SOFIA_REPROVADA_FINAL_LINES = [
   "Muito obrigada por compartilhar tudo isso com a gente!",
   "Hoje seu perfil não seguiu para a próxima etapa.",
-  "Vamos guardar seu cadastro para futuras oportunidades na Tania Joias.",
+  `Vamos guardar seu cadastro para futuras oportunidades na ${BRAND.nome}.`,
 ] as const
 
 // IMPLEMENTATION-LGPD-001A — mesmo valor do gate server-side
@@ -306,7 +306,7 @@ export const SOFIA_STEPS: SofiaStep[] = [
   {
     key: "objetivo",
     kind: "textarea",
-    question: "Por que você deseja trabalhar com a Tania Joias?",
+    question: `Por que você deseja trabalhar com a ${BRAND.nome}?`,
     placeholder: "Conte um pouco sobre o seu objetivo...",
     schema: qualificacaoSchema.shape.objetivo,
     skip: trabalhaFalso,

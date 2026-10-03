@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { toast } from "sonner"
 import { MessageCircle, ThumbsDown, ThumbsUp } from "lucide-react"
 import { PERFIL_COMERCIAL_LABEL, type EtapaPosAprovacao, type PerfilComercial } from "@tania-joias/shared"
@@ -30,7 +31,7 @@ function mensagemParaTania(
   resumo: string,
 ): string {
   const linhas = [
-    `Oi Tania! A ${nome}${cidade ? ` (${cidade})` : ""} já foi aprovada pelo sistema e completou todo o cadastro — só está faltando sua aprovação final pra liberar o Mostruário pra ela.`,
+    `Oi ${BRAND.dona}! A ${nome}${cidade ? ` (${cidade})` : ""} já foi aprovada pelo sistema e completou todo o cadastro — só está faltando sua aprovação final pra liberar o Mostruário pra ela.`,
     "",
     `📞 ${formatPhone(telefone)}`,
   ]
@@ -75,7 +76,7 @@ export function TaniaAprovacaoSection({
 
   function handleEnviarTania() {
     if (!taniaTelefone) {
-      toast.error("Número da Tania não configurado. Veja Configurações.")
+      toast.error(`Número da ${BRAND.dona} não configurado. Veja Configurações.`)
       return
     }
     const mensagem = mensagemParaTania(
@@ -113,11 +114,11 @@ export function TaniaAprovacaoSection({
   // como ação auxiliar/opcional — nunca um pré-requisito pra aprovar/recusar.
   return (
     <section>
-      <h3 className="mb-2 text-sm font-semibold text-foreground">Aprovação final da Tania</h3>
+      <h3 className="mb-2 text-sm font-semibold text-foreground">Aprovação final da {BRAND.dona}</h3>
 
       <div className="space-y-3">
         <p className="text-sm text-muted-foreground">
-          Ficha preenchida. Aguardando decisão da Tania.
+          Ficha preenchida. Aguardando decisão da {BRAND.dona}.
         </p>
 
         <div className="flex gap-2">
@@ -129,7 +130,7 @@ export function TaniaAprovacaoSection({
             onClick={() => void handleResposta(true)}
           >
             <ThumbsUp className="size-3.5" />
-            Tania aprovou
+            {BRAND.dona} aprovou
           </Button>
           <Button
             size="sm"
@@ -139,7 +140,7 @@ export function TaniaAprovacaoSection({
             onClick={() => void handleResposta(false)}
           >
             <ThumbsDown className="size-3.5" />
-            Tania recusou
+            {BRAND.dona} recusou
           </Button>
         </div>
 
@@ -160,7 +161,7 @@ export function TaniaAprovacaoSection({
         <div className="border-t border-border pt-2">
           {leadEtapa === "aguardando_tania" && (
             <Badge variant="gold" className="mb-2">
-              Mensagem já enviada pra Tania
+              Mensagem já enviada pra {BRAND.dona}
             </Badge>
           )}
           <Button
@@ -170,7 +171,7 @@ export function TaniaAprovacaoSection({
             onClick={handleEnviarTania}
           >
             <MessageCircle className="size-3.5" />
-            Enviar pra Tania (opcional)
+            Enviar pra {BRAND.dona} (opcional)
           </Button>
           <p className="mt-1 text-xs text-muted-foreground">
             Ação auxiliar — não é necessária pra aprovar ou recusar acima.

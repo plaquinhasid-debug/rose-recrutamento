@@ -293,7 +293,7 @@ test("buildWhatsappShareMessage: contém o link completo e o texto padrão do pe
   const url = buildReferralUrl("7E9NH4VD")
   const msg = buildWhatsappShareMessage(url)
   assert.ok(msg.includes(url))
-  assert.ok(msg.includes("Tania Joias"))
+  assert.ok(msg.includes("Rose Semi Jóias"))
   assert.ok(msg.includes("revendedoras"))
 })
 

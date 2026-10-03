@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { useEffect, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -36,7 +37,7 @@ function Shell({ children }: React.PropsWithChildren) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 py-5 text-center">
-        <span className="font-display text-lg font-semibold tracking-wide">Tania Joias</span>
+        <span className="font-display text-lg font-semibold tracking-wide">{BRAND.nome}</span>
       </header>
       <main className="mx-auto max-w-xl px-6 py-10">{children}</main>
     </div>
@@ -217,7 +218,7 @@ export function EmbaixadoraConvitePage() {
             <CardTitle>Não conseguimos confirmar</CardTitle>
             <CardDescription>
               Não foi possível confirmar se o cadastro foi concluído. Antes de tentar novamente, entre em
-              contato com a Tania Jóias.
+              contato com a {BRAND.nome}.
             </CardDescription>
           </CardHeader>
         </Card>

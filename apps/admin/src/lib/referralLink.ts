@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 // IMPLEMENTATION-EMBAIXADORAS-E2.8 — lógica pura do link pessoal de
 // indicação no Portal da Embaixadora. Constrói a URL a partir do
 // `codigo_referral` que `get-my-embaixadora` já devolve — nenhuma chamada
@@ -24,7 +25,7 @@ export function buildReferralUrl(codigoReferral: string): string {
 
 /** Mensagem padrão de compartilhamento — mesma sugerida no pedido da E2.8, seção 15. */
 export function buildWhatsappShareMessage(referralUrl: string): string {
-  return `Oi! A Tania Joias está selecionando novas revendedoras. Se tiver interesse, você pode conhecer e fazer seu cadastro por este link: ${referralUrl}`
+  return `Oi! A ${BRAND.nome} está selecionando novas revendedoras. Se tiver interesse, você pode conhecer e fazer seu cadastro por este link: ${referralUrl}`
 }
 
 /** Link padrão de compartilhamento do WhatsApp (wa.me, sem API paga) — abre o app/web do WhatsApp com a mensagem pré-preenchida, URL-encoded. */

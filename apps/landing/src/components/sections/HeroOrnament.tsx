@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { motion } from "framer-motion"
 
 /**
@@ -74,8 +75,8 @@ export function HeroOrnament() {
       </motion.svg>
 
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-6">
-        <p className="font-display text-lg italic text-gold/90">Tania Joias</p>
-        <p className="text-xs tracking-wide text-white/70">Semijoias premium</p>
+        <p className="font-display text-lg italic text-gold/90">{BRAND.nomeCurto}</p>
+        <p className="text-xs tracking-wide text-white/70">{BRAND.slogan}</p>
       </div>
     </div>
   )

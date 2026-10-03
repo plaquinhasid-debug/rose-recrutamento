@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { Json, NaturalConversationModeValue } from "@tania-joias/shared"
 
@@ -285,7 +286,7 @@ export function useSaveWhatsappNotificacaoTaniaAtiva() {
           chave: WHATSAPP_NOTIFICACAO_TANIA_ATIVA_KEY,
           valor: { ativa } as unknown as Json,
           descricao:
-            "Liga/desliga o aviso automático pra Tania via WhatsApp Cloud API (número oficial) assim que uma candidata preenche a Ficha de Aprovação. Se o envio falhar (ex.: fora da janela de 24h de atendimento), a lead fica em 'Confirmada' e o botão manual 'Enviar pra Tania' continua disponível. Default false — só liga depois de testar.",
+            `Liga/desliga o aviso automático pra ${BRAND.dona} via WhatsApp Cloud API (número oficial) assim que uma candidata preenche a Ficha de Aprovação. Se o envio falhar (ex.: fora da janela de 24h de atendimento), a lead fica em 'Confirmada' e o botão manual 'Enviar pra ${BRAND.dona}' continua disponível. Default false — só liga depois de testar.`,
         },
         { onConflict: "chave" },
       )

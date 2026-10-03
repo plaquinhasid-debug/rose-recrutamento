@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { Banknote, Check, Gem, GraduationCap, Heart, HeartHandshake, Smartphone, Star } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
@@ -26,7 +27,7 @@ const BENEFICIOS = [
   {
     icon: Banknote,
     title: "Excelente Margem de Lucro",
-    text: "Ganhe até 40% de comissão revendendo produtos de alto valor percebido.",
+    text: `Ganhe até ${BRAND.comissaoMaxima} de comissão revendendo produtos de alto valor percebido.`,
   },
   {
     icon: Smartphone,
@@ -48,10 +49,10 @@ export function QuemSomos({ onOpenSofia }: QuemSomosProps) {
       <div className="mx-auto max-w-4xl px-6 text-center">
         <Reveal>
           <h2 className="font-display text-3xl font-semibold text-foreground sm:text-4xl">
-            Quem é a Tania Joias
+            Quem é a {BRAND.nome}
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-            Na Tania Joias acreditamos que toda mulher pode conquistar sua independência
+            Na {BRAND.nome} acreditamos que toda mulher pode conquistar sua independência
             financeira revendendo semijoias premium.
           </p>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
@@ -59,15 +60,14 @@ export function QuemSomos({ onOpenSofia }: QuemSomosProps) {
             etapas para que você venda com segurança, mesmo sem experiência.
           </p>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Atendemos atualmente Mauá, Ribeirão Pires, Santo André, São Bernardo do Campo e São
-            Caetano do Sul. Nossa área de atendimento pode ser ampliada conforme a logística da
+            Atendemos atualmente {BRAND.cidadesTexto}. Nossa área de atendimento pode ser ampliada conforme a logística da
             empresa.
           </p>
         </Reveal>
 
         <Reveal delay={0.1}>
           <h3 className="mt-14 font-display text-xl font-semibold text-foreground">
-            Por que escolher a Tania Joias?
+            Por que escolher a {BRAND.nome}?
           </h3>
           <div className="mt-8 grid gap-8 text-left sm:grid-cols-2 lg:grid-cols-3">
             {BENEFICIOS.map((beneficio, index) => (

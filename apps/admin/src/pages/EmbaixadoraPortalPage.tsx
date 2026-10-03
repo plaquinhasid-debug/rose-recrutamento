@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { Copy, LogOut, MessageCircle } from "lucide-react"
 import { toast } from "sonner"
 
@@ -68,7 +69,7 @@ export default function EmbaixadoraPortalPage() {
         <Card>
           <CardHeader>
             <CardTitle>Olá, {nome}</CardTitle>
-            <CardDescription>Programa Embaixadoras Tania Jóias</CardDescription>
+            <CardDescription>Programa Embaixadoras {BRAND.nome}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>

@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 // IMPLEMENTATION-EMBAIXADORAS-E3.1 — rótulos da lista de indicações do
 // Admin. Lógica pura (sem React), testável via node:test.
 import type { EtapaPosAprovacao, IndicacaoAdmin, LeadStatus, RecompensaStatus } from "@/hooks/useIndicacoesAdmin"
@@ -19,7 +20,7 @@ const LEAD_STATUS: Record<LeadStatus, BadgeLabel> = {
 const ETAPA: Record<Exclude<EtapaPosAprovacao, null>, string> = {
   contatada: "Contatada",
   confirmada: "Confirmada",
-  aguardando_tania: "Aguardando Tania",
+  aguardando_tania: `Aguardando ${BRAND.dona}`,
   ativa: "Ativa",
   desistiu: "Desistiu",
 }

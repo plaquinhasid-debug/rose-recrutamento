@@ -1,27 +1,15 @@
+import { BRAND } from "@tania-joias/shared"
 import { Star } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
 import { Card, CardContent } from "@/components/ui/card"
 
-const TESTIMONIALS = [
-  {
-    name: "Michely",
-    cidade: "Mauá",
-    text: "Comecei revendendo pra amigas só pra complementar a renda. Hoje já tenho uma carteira de clientes fiéis e o dinheiro extra virou parte importante do orçamento de casa.",
-  },
-  {
-    name: "Sonia Aguiar",
-    cidade: "Mauá",
-    text: "Eu não tinha experiência nenhuma com vendas. O treinamento me deu segurança pra começar, e em poucos meses já sentia a diferença no bolso, sem largar minhas outras atividades.",
-  },
-  {
-    name: "Gislaine",
-    cidade: "Mauá",
-    text: "O que mais me conquistou foi a flexibilidade. Encaixo as vendas no meu tempo livre, entre um compromisso e outro, e ainda assim vejo resultado todo mês.",
-  },
-]
+const TESTIMONIALS = BRAND.depoimentos.map((d) => ({ name: d.nome, cidade: d.cidade, text: d.texto }))
 
 export function Depoimentos() {
+  // Sem depoimentos reais da marca, a seção não aparece.
+  if (TESTIMONIALS.length === 0) return null
+
   return (
     <section id="depoimentos" className="bg-secondary/50 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-6">

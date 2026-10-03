@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { useState, type MouseEvent } from "react"
 import { toast } from "sonner"
 import { useSortable } from "@dnd-kit/sortable"
@@ -289,7 +290,7 @@ export function KanbanCard({ lead, onClick }: KanbanCardProps) {
 
       {taniaNotificationStatus && (
         <div className="mt-2 flex items-center gap-1.5" onClick={(event) => event.stopPropagation()}>
-          <span className="text-[11px] text-muted-foreground">Notificação Tania:</span>
+          <span className="text-[11px] text-muted-foreground">Notificação {BRAND.dona}:</span>
           <Badge variant={TANIA_NOTIFICATION_BADGE_VARIANT[taniaNotificationStatus.kind]}>
             {TANIA_NOTIFICATION_STATUS_LABEL[taniaNotificationStatus.kind]}
           </Badge>

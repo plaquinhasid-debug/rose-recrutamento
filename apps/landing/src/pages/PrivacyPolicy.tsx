@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 // IMPLEMENTATION-LGPD-001A — atualização mínima: corrige a codificação de
 // caracteres (o texto anterior estava salvo com acentuação corrompida,
 // ex.: "PolÃ­tica" em vez de "Política") e acrescenta transparência sobre
@@ -24,7 +25,7 @@ const sections = [
   },
   {
     title: "5. WhatsApp e comunicações",
-    body: "Quando você entra em contato pelo WhatsApp, tratamos seu número, nome de perfil e o conteúdo das mensagens para prestar atendimento. Mensagens iniciadas pela Tania Joias respeitarão as permissões concedidas, as regras da Plataforma WhatsApp Business e a legislação aplicável.",
+    body: `Quando você entra em contato pelo WhatsApp, tratamos seu número, nome de perfil e o conteúdo das mensagens para prestar atendimento. Mensagens iniciadas pela ${BRAND.nome} respeitarão as permissões concedidas, as regras da Plataforma WhatsApp Business e a legislação aplicável.`,
   },
   {
     title: "6. Compartilhamento",
@@ -40,7 +41,7 @@ const sections = [
   },
   {
     title: "9. Exclusão de dados",
-    body: "Para solicitar acesso, correção ou exclusão de seus dados, envie um e-mail para taniajoiasmaua@gmail.com, informando seu nome e telefone. Poderemos solicitar informações adicionais apenas para confirmar a identidade do solicitante.",
+    body: `Para solicitar acesso, correção ou exclusão de seus dados, envie um e-mail para ${BRAND.emailContato}, informando seu nome e telefone. Poderemos solicitar informações adicionais apenas para confirmar a identidade do solicitante.`,
   },
   {
     title: "10. Atualizações desta política",
@@ -54,7 +55,7 @@ export function PrivacyPolicy() {
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
           <a href="/" className="font-display text-xl font-semibold">
-            Tania Joias
+            {BRAND.nome}
           </a>
           <a href="/" className="text-sm text-muted-foreground hover:text-foreground">
             Voltar ao site
@@ -70,7 +71,7 @@ export function PrivacyPolicy() {
           Política de Privacidade
         </h1>
         <p className="mt-5 max-w-3xl leading-7 text-muted-foreground">
-          A Tania Joias respeita sua privacidade e trata dados pessoais com transparência,
+          A {BRAND.nome} respeita sua privacidade e trata dados pessoais com transparência,
           segurança e de acordo com a Lei Geral de Proteção de Dados (LGPD). Esta política
           explica como os dados são tratados em nosso site, formulários e atendimento pelo
           WhatsApp.
@@ -88,8 +89,8 @@ export function PrivacyPolicy() {
         <section className="mt-12 rounded-2xl border border-border bg-secondary p-6 sm:p-8">
           <h2 className="font-display text-2xl font-semibold">Contato</h2>
           <p className="mt-3 leading-7 text-muted-foreground">
-            Controladora: Tania Joias<br />
-            E-mail: <a className="underline hover:text-foreground" href="mailto:taniajoiasmaua@gmail.com">taniajoiasmaua@gmail.com</a>
+            Controladora: {BRAND.nome}<br />
+            E-mail: <a className="underline hover:text-foreground" href={`mailto:${BRAND.emailContato}`}>{BRAND.emailContato}</a>
           </p>
         </section>
 

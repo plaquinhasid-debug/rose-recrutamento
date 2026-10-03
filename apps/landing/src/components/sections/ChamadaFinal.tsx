@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { Reveal } from "@/components/Reveal"
 import { Button } from "@/components/ui/button"
 
@@ -17,8 +18,8 @@ export function ChamadaFinal({ onOpenSofia }: ChamadaFinalProps) {
             Pronta para começar sua renda extra?
           </h2>
           <p className="mt-4 text-primary-foreground/70">
-            Fale com a Sofia agora e descubra se você tem o perfil para ser uma
-            revendedora Tania Joias. Leva menos de dois minutos.
+            Fale com a {BRAND.assistente} agora e descubra se você tem o perfil para ser uma
+            revendedora {BRAND.nome}. Leva menos de dois minutos.
           </p>
           <Button
             size="lg"

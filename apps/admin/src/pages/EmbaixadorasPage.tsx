@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { PageHeader } from "@/components/common/PageHeader"
 import { ErrorState } from "@/components/common/ErrorState"
 import { EmbaixadorasTable } from "@/components/embaixadoras/EmbaixadorasTable"
@@ -15,7 +16,7 @@ export default function EmbaixadorasPage() {
     <div>
       <PageHeader
         title="Embaixadoras"
-        description="Gerencie as participantes do Programa Embaixadoras Tania Jóias."
+        description={`Gerencie as participantes do Programa Embaixadoras ${BRAND.nome}.`}
         action={<ConvidarEmbaixadoraDialog />}
       />
 

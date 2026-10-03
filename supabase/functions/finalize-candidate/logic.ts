@@ -1,3 +1,4 @@
+import { BRAND } from "../_shared/brand.ts"
 // Lógica pura (sem I/O) de `finalize-candidate` — motor determinístico do
 // IPR e dos gates de elegibilidade. Extraído de `index.ts` (RFC-INTELLIGENCE-006)
 // só para permitir testar essas funções puras via `finalize-candidate.examples.ts`
@@ -210,7 +211,7 @@ export function gerarResumo(
 ) {
   const primeiroNome = payload.nome.split(" ")[0]
   if (!payload.trabalha) {
-    return `${primeiroNome} respondeu que não está trabalhando atualmente. Cadastro salvo para futuras oportunidades da Tania Joias.`
+    return `${primeiroNome} respondeu que não está trabalhando atualmente. Cadastro salvo para futuras oportunidades da ${BRAND.nome}.`
   }
   if (!idadeElegivel) {
     return `${primeiroNome} informou ${payload.idade ?? "idade não informada"} — abaixo da idade mínima de ${IDADE_MINIMA} anos. Cadastro salvo para futuras oportunidades.`

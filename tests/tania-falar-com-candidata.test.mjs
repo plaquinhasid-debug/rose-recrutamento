@@ -13,7 +13,7 @@ test("usa só o primeiro nome, mensagem exata aprovada no RFC", () => {
   const mensagem = mensagemFalarComCandidata("Maria Silva Santos")
   assert.equal(
     mensagem,
-    "Oi, Maria! Aqui é a Tania, da Tania Joias. Estou analisando seu cadastro para revendedora e gostaria de falar rapidinho com você.",
+    "Oi, Maria! Aqui é a Carol, da Rose Semi Jóias. Estou analisando seu cadastro para revendedora e gostaria de falar rapidinho com você.",
   )
 })
 

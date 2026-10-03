@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { NavLink } from "react-router-dom"
 import {
   BarChart3,
@@ -16,7 +17,7 @@ const NAV_ITEMS = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/leads", label: "Leads", icon: Users },
   { to: "/crm", label: "CRM", icon: KanbanSquare },
-  { to: "/embaixadoras", label: "Embaixadoras", icon: Gem },
+  ...(BRAND.modulos.embaixadoras ? [{ to: "/embaixadoras", label: "Embaixadoras", icon: Gem }] : []),
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/radar", label: "Radar da Sofia", icon: Radar },
   { to: "/abandonos", label: "Abandonos", icon: UserX },
@@ -40,7 +41,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <span className="font-display text-xl font-semibold text-gold">TJ</span>
         ) : (
           <span className="font-display text-2xl font-medium tracking-tight text-foreground">
-            Tania Joias
+            {BRAND.nome}
           </span>
         )}
       </div>

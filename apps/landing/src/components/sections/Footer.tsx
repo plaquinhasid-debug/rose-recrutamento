@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { Instagram, MapPin, Phone } from "lucide-react"
 
 export function Footer() {
@@ -6,16 +7,16 @@ export function Footer() {
   return (
     <footer className="border-t border-border py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 text-center sm:flex-row sm:justify-between sm:text-left">
-        <p className="font-display text-lg font-semibold text-foreground">Tania Joias</p>
+        <p className="font-display text-lg font-semibold text-foreground">{BRAND.nomeCurto}</p>
         <p className="text-xs text-muted-foreground">
-          © {year} Tania Joias. Todos os direitos reservados. Atendemos atualmente Mauá,
-          Ribeirão Pires, Santo André, São Bernardo do Campo e São Caetano do Sul.
+          © {year} {BRAND.nome}. Todos os direitos reservados. Atendemos atualmente{" "}
+          {BRAND.cidadesTexto}.
         </p>
         <a
-          href="https://www.instagram.com/taniajoias_/"
+          href={BRAND.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Instagram da Tania Joias"
+          aria-label={`Instagram da ${BRAND.nome}`}
           className="flex items-center justify-center rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-gold"
         >
           <Instagram className="size-5" />
@@ -28,11 +29,11 @@ export function Footer() {
         </a>
         <span className="flex items-center gap-1.5">
           <MapPin className="size-3.5 shrink-0" />
-          R. Vereador Fernando Zanella, 13 — 1º andar, sala 04, Centro, Mauá/SP
+          {BRAND.endereco}
         </span>
-        <a href="tel:+551146370390" className="flex items-center gap-1.5 hover:text-foreground">
+        <a href={`tel:${BRAND.telefoneTel}`} className="flex items-center gap-1.5 hover:text-foreground">
           <Phone className="size-3.5 shrink-0" />
-          (11) 94637-0390
+          {BRAND.telefoneExibicao}
         </a>
       </div>
     </footer>

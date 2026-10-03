@@ -1,28 +1,15 @@
+import { BRAND } from "@tania-joias/shared"
 import { Reveal } from "@/components/Reveal"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-const TIERS = [
-  {
-    label: "Começando",
-    hours: "1 hora por dia",
-    range: "R$ 300 – R$ 600 /mês",
-    description: "Vendendo para amigas e família, divulgando nas suas redes.",
-  },
-  {
-    label: "Consistente",
-    hours: "2 a 3 horas por dia",
-    range: "R$ 800 – R$ 1.800 /mês",
-    description: "Com uma carteira de clientes fiéis e divulgação regular.",
-    highlight: true,
-  },
-  {
-    label: "Dedicada",
-    hours: "4+ horas por dia",
-    range: "R$ 2.000+ /mês",
-    description: "Tratando a revenda como uma atividade principal.",
-  },
-]
+const TIERS = BRAND.faixasGanho.map((f) => ({
+  label: f.label,
+  hours: f.horas,
+  range: f.faixa,
+  description: f.descricao,
+  highlight: f.destaque,
+}))
 
 export function QuantoPossoGanhar() {
   return (
@@ -68,7 +55,7 @@ export function QuantoPossoGanhar() {
 
         <Reveal delay={0.2}>
           <p className="mt-8 text-center text-xs text-muted-foreground">
-            Valores de referência, baseados na experiência da operação da Tania Joias. O
+            Valores de referência, baseados na experiência da operação da {BRAND.nome}. O
             ganho real depende do volume vendido e da comissão aplicável, e não constitui
             garantia de renda.
           </p>

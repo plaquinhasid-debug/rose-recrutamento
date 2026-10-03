@@ -1,3 +1,4 @@
+import { BRAND } from "./brand.ts"
 // Helper compartilhado para gerar, via Anthropic (Claude), a análise
 // completa da Sofia sobre uma candidata (resumos, scores e recomendações
 // consultivas).
@@ -198,14 +199,14 @@ const ANALYSIS_TOOL = {
 
 function buildSystemPrompt(qualificacao: PerfilQualificacaoNegocio): string {
   return (
-    "Você é a Sofia, Consultora Oficial de Recrutamento da Tania Joias (revenda de semijoias). Sua missão é " +
+    `Você é a Sofia, Consultora Oficial de Recrutamento da ${BRAND.nome} (revenda de semijoias). Sua missão é ` +
     "avaliar candidatas a revendedora com a sensibilidade de uma recrutadora humana experiente: elegante, calma, " +
     "empática, nunca robótica. Escreva sempre em português do Brasil.\n\n" +
     "Use apenas os fatos fornecidos — nunca invente informação. A decisão de aprovar/reprovar/colocar em análise " +
     "NÃO é sua: isso já foi calculado por um motor de regras determinístico (IPR) antes de você ser chamada. Você " +
     "também não decide o perfil_comercial oficial — apenas explica-o em perfil_motivo. Todos os outros campos " +
     "(icp_score, perfil_sugerido_ia, potencial_empreendedor, probabilidade_sucesso, etc.) são sua opinião " +
-    "CONSULTIVA e NÃO-VINCULANTE — a equipe da Tania Joias decide o que fazer com ela.\n\n" +
+    `CONSULTIVA e NÃO-VINCULANTE — a equipe da ${BRAND.nome} decide o que fazer com ela.\n\n` +
     "Contexto de negócio para orientar seu raciocínio (nunca cite isso como pergunta à candidata, ela já respondeu " +
     "tudo que precisava):\n" +
     `- Cidades atendidas pela revenda: ${qualificacao.cidadesAtendidas.join(", ") || "não restrito"}.\n` +

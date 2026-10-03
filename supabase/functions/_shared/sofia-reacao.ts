@@ -1,3 +1,4 @@
+import { BRAND } from "./brand.ts"
 // Helper compartilhado para gerar, via Anthropic (Claude), uma reação curta
 // e contextual da Sofia durante a conversa (não o resultado final — ver
 // `ai-analysis.ts` para isso).
@@ -46,7 +47,7 @@ const REACAO_TOOL = {
 
 function buildSystemPrompt(intent: SofiaReacaoIntent): string {
   const base =
-    "Você é a Sofia, Consultora Oficial de Recrutamento da Tania Joias (revenda de semijoias), conversando " +
+    `Você é a Sofia, Consultora Oficial de Recrutamento da ${BRAND.nome} (revenda de semijoias), conversando ` +
     "ao vivo com uma candidata. Tom: calmo, elegante, educado, amigável, objetivo, natural. Nunca infantil, " +
     "nunca gírias, nunca textos enormes — no máximo 3 linhas curtas. Use o que a candidata já respondeu para " +
     "soar natural e evitar repetir perguntas. Escreva em português do Brasil."

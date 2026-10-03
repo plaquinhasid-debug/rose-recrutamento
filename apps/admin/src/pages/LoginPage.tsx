@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import * as React from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Loader2, Lock, Mail } from "lucide-react"
@@ -134,7 +135,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="mb-8 text-center">
           <p className="font-display text-3xl font-medium tracking-tight text-foreground">
-            Tania Joias
+            {BRAND.nome}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
             Painel administrativo — acesso da equipe

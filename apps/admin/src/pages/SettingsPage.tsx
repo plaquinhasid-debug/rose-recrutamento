@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import * as React from "react"
 import { toast } from "sonner"
 import { Loader2, Plus, X } from "lucide-react"
@@ -105,8 +106,8 @@ export default function SettingsPage() {
       await saveNotificacaoTania.mutateAsync(checked)
       toast.success(
         checked
-          ? "Aviso automático pra Tania ativado."
-          : "Aviso automático pra Tania desativado.",
+          ? `Aviso automático pra ${BRAND.dona} ativado.`
+          : `Aviso automático pra ${BRAND.dona} desativado.`,
       )
     } catch {
       toast.error("Não foi possível atualizar essa configuração.")
@@ -400,11 +401,11 @@ export default function SettingsPage() {
 
       <Card className="mb-6 max-w-2xl">
         <CardHeader>
-          <CardTitle>WhatsApp — Avisar a Tania quando a Ficha chega</CardTitle>
+          <CardTitle>WhatsApp — Avisar a {BRAND.dona} quando a Ficha chega</CardTitle>
           <CardDescription>
-            Quando ativado, assim que uma candidata preenche a Ficha de Aprovação, a Tania recebe
+            Quando ativado, assim que uma candidata preenche a Ficha de Aprovação, a {BRAND.dona} recebe
             automaticamente o resumo (nome, perfil, localização) pelo WhatsApp oficial (BrilhoFlow
-            Atendimento) — sem precisar de ninguém clicar em "Enviar pra Tania" no Admin. Ela responde
+            Atendimento) — sem precisar de ninguém clicar em "Enviar pra {BRAND.dona}" no Admin. Ela responde
             "sim"/"não" na mesma conversa e o sistema decide sozinho. Se o envio falhar (ex.: fora da
             janela de atendimento de 24h), a lead fica em "Confirmada" e o botão manual continua ali
             como reserva.
@@ -418,7 +419,7 @@ export default function SettingsPage() {
               <div>
                 <Label htmlFor="whatsapp-notificacao-tania-ativa">Aviso automático ativado</Label>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  A Tania precisa responder na conversa do número oficial, não na conversa pessoal de
+                  A {BRAND.dona} precisa responder na conversa do número oficial, não na conversa pessoal de
                   sempre — só ali o sistema consegue ler a resposta.
                 </p>
               </div>

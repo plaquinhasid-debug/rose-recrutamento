@@ -1,3 +1,4 @@
+import { BRAND } from "../_shared/brand.ts"
 // Edge Function: daily-leads-report
 //
 // Roda todo dia de manhã via pg_cron (ver migração `schedule_daily_leads_report`),
@@ -83,7 +84,7 @@ function renderEmailHtml(params: {
 
   return `
   <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
-    <h2 style="color:#8a6d3b;">Relatório diário — Tania Joias</h2>
+    <h2 style="color:#8a6d3b;">Relatório diário — ${BRAND.nome}</h2>
     <p style="color:#555;">Leads de <strong>${label}</strong></p>
 
     <div style="display:flex; gap:12px; margin: 20px 0;">
@@ -129,7 +130,7 @@ function renderEmailHtml(params: {
     }
 
     <p style="margin-top:30px; font-size:12px; color:#999;">
-      Enviado automaticamente pelo sistema Tania Joias. Veja todos os detalhes no
+      Enviado automaticamente pelo sistema ${BRAND.nome}. Veja todos os detalhes no
       <a href="https://tania-joias-recrutamento.vercel.app" style="color:#8a6d3b;">painel Admin</a>.
     </p>
   </div>
@@ -223,7 +224,7 @@ Deno.serve(async () => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Tania Joias <onboarding@resend.dev>",
+      from: `${BRAND.nome} <onboarding@resend.dev>`,
       to: ["taniajoiasmaua@gmail.com"],
       subject: `Relatório diário de leads — ${label}`,
       html,

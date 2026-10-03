@@ -185,7 +185,7 @@ async function sendAutomaticReply(to, replyToMessageId) {
   if (!token || !phoneNumberId) throw new Error('Credenciais de envio do WhatsApp nÃ£o configuradas');
 
   const text = process.env.WHATSAPP_AUTO_REPLY_TEXT
-    ?? 'OlÃ¡! Recebemos sua mensagem na Tania Joias. Em breve continuaremos seu atendimento por aqui. âœ¨';
+    ?? 'Olá! Recebemos sua mensagem na Rose Semi Jóias. Em breve continuaremos seu atendimento por aqui. ✨';
   const result = await fetch(`https://graph.facebook.com/v26.0/${phoneNumberId}/messages`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

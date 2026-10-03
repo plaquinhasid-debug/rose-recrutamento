@@ -1,7 +1,8 @@
+import { BRAND } from "@tania-joias/shared"
 const NAV_LINKS = [
   { href: "#quem-somos", label: "Quem somos" },
   { href: "#como-funciona", label: "Como funciona" },
-  { href: "#depoimentos", label: "Depoimentos" },
+  ...(BRAND.depoimentos.length > 0 ? [{ href: "#depoimentos", label: "Depoimentos" }] : []),
   { href: "#faq", label: "Dúvidas" },
 ]
 
@@ -13,7 +14,7 @@ export function Header() {
           href="#top"
           className="shrink-0 font-display text-lg font-semibold tracking-wide text-foreground sm:text-xl"
         >
-          Tania Joias
+          {BRAND.nomeCurto}
         </a>
 
         <nav className="hidden items-center gap-8 lg:flex">

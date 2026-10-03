@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +16,7 @@ const FAQ_ITEMS = [
   {
     question: "Preciso investir algum valor para começar?",
     answer:
-      "Não. Você não precisa comprar estoque antecipado para começar a revender com a Tania Joias.",
+      `Não. Você não precisa comprar estoque antecipado para começar a revender com a ${BRAND.nome}.`,
   },
   {
     question: "Preciso ter experiência com vendas?",
