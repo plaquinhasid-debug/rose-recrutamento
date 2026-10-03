@@ -406,6 +406,12 @@ export type Database = {
           token: string
           trabalha_atualmente: boolean | null
           trabalho_endereco: string | null
+          casa_propria: string | null
+          documentos: Json
+          filhos_quantidade: number | null
+          instagram_profissional: string | null
+          restricao_cpf: string | null
+          trabalho_horario: string | null
           trabalho_telefone: string | null
           whatsapp_enviado_em: string | null
         }
@@ -441,6 +447,12 @@ export type Database = {
           token?: string
           trabalha_atualmente?: boolean | null
           trabalho_endereco?: string | null
+          casa_propria?: string | null
+          documentos?: Json
+          filhos_quantidade?: number | null
+          instagram_profissional?: string | null
+          restricao_cpf?: string | null
+          trabalho_horario?: string | null
           trabalho_telefone?: string | null
           whatsapp_enviado_em?: string | null
         }
@@ -476,6 +488,12 @@ export type Database = {
           token?: string
           trabalha_atualmente?: boolean | null
           trabalho_endereco?: string | null
+          casa_propria?: string | null
+          documentos?: Json
+          filhos_quantidade?: number | null
+          instagram_profissional?: string | null
+          restricao_cpf?: string | null
+          trabalho_horario?: string | null
           trabalho_telefone?: string | null
           whatsapp_enviado_em?: string | null
         }

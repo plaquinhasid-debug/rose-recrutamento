@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react"
 
 import { SofiaChatPanel } from "@/components/sofia/SofiaChatPanel"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { useReferralCode } from "@/hooks/useReferralCode"
 import { useSessionId } from "@/hooks/useSessionId"
 import { useSofiaFlow } from "@/hooks/useSofiaFlow"
 import { useUtmParams } from "@/hooks/useUtmParams"
@@ -22,13 +21,11 @@ interface SofiaAssistantProps {
 export function SofiaAssistant({ open, onOpenChange }: SofiaAssistantProps) {
   const sessionId = useSessionId()
   const utm = useUtmParams()
-  const ref = useReferralCode()
   const flow = useSofiaFlow({
     sessionId,
     utm,
     origem: utm.utm_source ?? "landing_page",
     campanha: utm.utm_campaign,
-    ref,
   })
 
   const conversationStarted = useRef(false)

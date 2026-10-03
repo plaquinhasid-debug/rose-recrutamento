@@ -10,7 +10,7 @@
 # ver docs/m0/M0-C-procedimento-fail-closed.md. Este arquivo existe para uso
 # local futuro e para registrar o verify_jwt de cada função.
 
-project_id = "tania-joias-recrutamento-local"
+project_id = "rose-semijoias-recrutamento-local"
 
 [api]
 enabled = true

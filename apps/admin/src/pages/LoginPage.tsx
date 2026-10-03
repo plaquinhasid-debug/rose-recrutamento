@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { resolveLoginNavigationTarget, resolveRoleAfterLogin } from "@/lib/roleResolution"
-import { fetchMinhaEmbaixadora } from "@/lib/myEmbaixadora"
+// Rose: sem programa de Embaixadoras — só a equipe entra no painel.
+const fetchMinhaEmbaixadora = async (): Promise<{ status: string } | null> => null
 
 // IMPLEMENTATION-EMBAIXADORAS-E2.2-D.0-B — `message` é opcional e só existe
 // quando um dos dois guards (equipe OU Embaixadora) redireciona pra cá

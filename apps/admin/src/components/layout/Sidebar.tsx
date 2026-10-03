@@ -1,26 +1,12 @@
 import { BRAND } from "@tania-joias/shared"
 import { NavLink } from "react-router-dom"
-import {
-  BarChart3,
-  Gem,
-  KanbanSquare,
-  LayoutDashboard,
-  Radar,
-  Settings,
-  UserX,
-  Users,
-} from "lucide-react"
+import { KanbanSquare, Settings, Users } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/leads", label: "Leads", icon: Users },
-  { to: "/crm", label: "CRM", icon: KanbanSquare },
-  ...(BRAND.modulos.embaixadoras ? [{ to: "/embaixadoras", label: "Embaixadoras", icon: Gem }] : []),
-  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
-  { to: "/radar", label: "Radar da Sofia", icon: Radar },
-  { to: "/abandonos", label: "Abandonos", icon: UserX },
+  { to: "/", label: "Candidatas (CRM)", icon: KanbanSquare, end: true },
+  { to: "/leads", label: "Lista e busca", icon: Users },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ]
 
@@ -38,7 +24,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
     >
       <div className="flex h-16 shrink-0 items-center justify-center border-b border-border px-4">
         {collapsed ? (
-          <span className="font-display text-xl font-semibold text-gold">TJ</span>
+          <span className="font-display text-xl font-semibold text-gold">{BRAND.nome.slice(0, 1)}</span>
         ) : (
           <span className="font-display text-2xl font-medium tracking-tight text-foreground">
             {BRAND.nome}
@@ -74,7 +60,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
           <p className="px-3 text-[11px] leading-tight text-muted-foreground">
             Painel Administrativo
             <br />
-            Semijoias premium
+            Recrutamento de revendedoras
           </p>
         )}
       </div>

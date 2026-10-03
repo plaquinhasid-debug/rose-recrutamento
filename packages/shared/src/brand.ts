@@ -29,11 +29,25 @@ export const BRAND = {
   /** Assistente virtual da landing. */
   assistente: "Sofia",
 
-  /** Destaque comercial do Hero e do card de margem. TODO: confirmar com a Carol. */
-  comissaoMaxima: "40%",
+  /** Destaque comercial do Hero e do card de margem (comissão de 30% a 50%, conforme vendas). */
+  comissaoMaxima: "50%",
 
-  /** Texto livre das cidades atendidas (exibição). A regra que pontua fica no banco. TODO */
-  cidadesTexto: "TODO: cidades atendidas pela Rose",
+  /** Texto das cidades atendidas (exibição). A regra que pontua fica no banco (Configurações). */
+  cidadesTexto: "Mauá, Santo André, São Bernardo do Campo, São Caetano do Sul, Diadema, Ribeirão Pires e Rio Grande da Serra",
+
+  /** Botões de cidade na conversa da Sofia (a candidata também pode digitar outra). */
+  cidadesSugeridas: [
+    "Mauá",
+    "Santo André",
+    "São Bernardo do Campo",
+    "São Caetano do Sul",
+    "Diadema",
+    "Ribeirão Pires",
+    "Rio Grande da Serra",
+  ],
+
+  /** Botões de profissão na conversa (as preferidas da Carol). A candidata também pode digitar outra. */
+  profissoesSugeridas: ["Professora", "Enfermeira / Técnica de enfermagem", "Trabalho em clínica ou hospital", "Cabeleireira", "Esteticista"],
 
   /** E-mail de contato (política de privacidade / LGPD). TODO */
   emailContato: "TODO@gmail.com",

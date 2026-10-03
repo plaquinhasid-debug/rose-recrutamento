@@ -27,14 +27,5 @@ on conflict (chave) do nothing;
 -- Roda 1x por dia às 10:00 America/Sao_Paulo (13:00 UTC) — depois do
 -- relatório diário (08:00), dando tempo dela ver o painel antes. A própria
 -- Edge Function checa a flag e não faz nada se estiver desligada.
-select cron.schedule(
-  'lembrete-ficha-pendente',
-  '0 13 * * *',
-  $$
-  select net.http_post(
-    url := 'https://iaqzbernshmhkqznleye.supabase.co/functions/v1/send-lembretes-ficha',
-    headers := '{"Content-Type": "application/json"}'::jsonb,
-    body := '{}'::jsonb
-  );
-  $$
-);
+-- ROSE: agendamento removido — apontava para o servidor da Tania
+-- (iaqzbernshmhkqznleye) e a função não existe no sistema da Rose.

@@ -252,14 +252,15 @@ export const RADAR_FUNIL_STEPS: { evento: EventoFunil; label: string }[] = [
  * com service role). Esta cópia serve só para exibir o breakdown no admin.
  */
 export const IPR_PESOS = {
-  trabalha: 50,
-  experiencia_vendas: 20,
+  trabalha: 40,
+  experiencia_vendas: 15,
   whatsapp: 10,
   instagram: 10,
   cidade_atendida: 10,
+  profissao_preferida: 15,
 } as const
 
 export const IPR_THRESHOLDS = {
-  aprovar: 80,
-  analiseMin: 60,
+  aprovar: 75,
+  analiseMin: 55,
 } as const

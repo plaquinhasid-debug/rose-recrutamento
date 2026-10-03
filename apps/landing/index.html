@@ -1,23 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <!--
-      EMBAIXADORAS TANIA JOIAS V1 — E2.5-E2.1 (achado BAIXO da auditoria
-      E2.5-E2). O favicon (same-origin) e a folha de estilo do Google Fonts
-      (cross-origin) logo abaixo podem ser buscados pelo parser ANTES do
-      script de sanitização do token de convite (mais abaixo neste <head>).
-      Sem esta tag, a ausência de vazamento do token via Referer numa
-      requisição cross-origin dependia só do valor padrão atual dos
-      browsers (strict-origin-when-cross-origin) — nunca configurado
-      explicitamente. Esta meta tag torna essa política explícita no
-      próprio documento, por isso precisa ser o primeiro elemento depois do
-      charset, antes de qualquer <link>/<script> que possa iniciar uma
-      requisição.
-    -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Seja revendedora Rose Semi Jóias. Semijoias em consignação, sem investimento inicial." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -26,62 +14,25 @@
     />
     <title>Rose Semi Jóias — Seja Revendedora</title>
     <script>
-      // EMBAIXADORAS TANIA JOIAS V1 — E2.5-E1. O token de convite de
-      // Embaixadora chega na URL como /embaixadoras/convite/<TOKEN> (path
-      // segment, nunca query string — ver create-ambassador-invite/
-      // handler.ts). Ele é uma CREDENCIAL (256 bits de entropia), então
-      // precisa sair da barra de endereço e de qualquer possível Referer
-      // ANTES do Meta Pixel (logo abaixo) rodar seu PageView automático,
-      // que captura a URL atual — e antes de qualquer código React montar.
-      //
-      // Por isso este bloco:
-      // 1. é um <script> clássico INLINE, sem type="module" e sem src — só
-      //    assim ele roda SÍNCRONO, no exato ponto em que o parser HTML o
-      //    encontra, nunca adiado (um <script type="module"> só roda depois
-      //    de todo o parsing do documento, o que seria tarde demais aqui);
-      // 2. está posicionado ANTES do <script> do Meta Pixel no documento —
-      //    scripts síncronos executam na ordem em que aparecem no HTML, e a
-      //    troca de URL abaixo (history.replaceState) já reflete pro
-      //    document.location que o Pixel lê em seguida.
-      //
-      // O token capturado vai só pra uma variável global em memória
-      // (window.__EMBAIXADORA_INVITE_TOKEN__) — nunca localStorage,
-      // sessionStorage, cookie ou IndexedDB. `apps/landing/src/hooks/
-      // useAmbassadorInviteToken.ts` lê essa variável uma única vez (efeito
-      // colateral isolado do inicializador puro, seguro contra o
-      // double-invoke do StrictMode) e limpa a referência logo depois.
-      //
-      // A regex abaixo precisa ficar TEXTUALMENTE idêntica à de
-      // apps/landing/src/lib/ambassadorInvite.ts (INVITE_TOKEN_PATH_REGEX)
-      // — não dá pra importar o módulo aqui (quebraria a garantia de
-      // execução síncrona do item 1). tests/embaixadora-convite.test.mjs
-      // trava as duas cópias uma contra a outra.
+      // Meta Pixel da Rose. O ID vem da variável de ambiente VITE_META_PIXEL_ID
+      // (Vercel → Settings → Environment Variables). Sem ID, o pixel não carrega.
       (function () {
-        var m = /^\/embaixadoras\/convite\/([A-Za-z0-9_-]+)\/?$/.exec(window.location.pathname);
-        if (m) {
-          window.__EMBAIXADORA_INVITE_TOKEN__ = m[1];
-          window.history.replaceState(null, "", "/embaixadoras/convite");
-        }
+        var pixelId = "%VITE_META_PIXEL_ID%";
+        if (!pixelId || pixelId.indexOf("%") === 0) return;
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', pixelId);
+        fbq('track', 'PageView');
       })();
-    </script>
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1763659250977870');
-      fbq('track', 'PageView');
     </script>
   </head>
   <body>
-    <noscript>
-      <img height="1" width="1" style="display:none" alt=""
-        src="https://www.facebook.com/tr?id=1763659250977870&ev=PageView&noscript=1" />
-    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

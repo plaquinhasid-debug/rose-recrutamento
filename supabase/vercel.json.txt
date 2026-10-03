@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd apps/landing && npm run build",
-  "outputDirectory": "apps/landing/dist",
-  "installCommand": "npm install"
-}

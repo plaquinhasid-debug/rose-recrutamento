@@ -6,12 +6,8 @@ import { Sidebar } from "@/components/layout/Sidebar"
 import { Topbar } from "@/components/layout/Topbar"
 
 const TITLES: Record<string, string> = {
-  "/": "Dashboard",
-  "/leads": "Leads",
-  "/crm": "CRM",
-  "/embaixadoras": "Embaixadoras",
-  "/relatorios": "Relatórios",
-  "/radar": "Radar da Sofia",
+  "/": "Candidatas",
+  "/leads": "Lista e busca",
   "/configuracoes": "Configurações",
 }
 

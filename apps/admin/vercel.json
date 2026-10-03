@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/webhooks/whatsapp", "destination": "/api/webhooks/whatsapp" },
     { "source": "/politica-de-privacidade", "destination": "/politica-de-privacidade.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

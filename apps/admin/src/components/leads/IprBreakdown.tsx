@@ -9,6 +9,7 @@ const CRITERIA_LABELS: Record<keyof typeof IPR_PESOS, string> = {
   whatsapp: "Possui WhatsApp",
   instagram: "Possui Instagram",
   cidade_atendida: "Cidade atendida",
+  profissao_preferida: "Profissão preferida (escola, saúde, beleza)",
 }
 
 interface IprBreakdownProps {

@@ -14,8 +14,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2"
 
 import { sendMetaLeadEvent } from "../_shared/meta-conversions.ts"
-import { sendWhatsappApprovalTemplate, sendWhatsappFichaTemplate } from "../_shared/whatsapp-cloud-api.ts"
-import { recordOutboundWhatsappMessage } from "../_shared/whatsapp-message-log.ts"
 import { CLAUDE_MODEL, generateAiAnalysis } from "../_shared/ai-analysis.ts"
 // IMPLEMENTATION-EMBAIXADORAS-E2.8 — cópia local (não import cruzando pra
 // packages/shared): finalize-candidate já é deployado com a convenção
@@ -24,25 +22,20 @@ import { CLAUDE_MODEL, generateAiAnalysis } from "../_shared/ai-analysis.ts"
 // empacotamento. Mesma disciplina já usada por normalizeBrazilPhone em
 // _shared/whatsapp-cloud-api.ts — ver cabeçalho de _shared/phone.ts pro
 // motivo completo.
-import { normalizeBrazilianPhone } from "../_shared/phone.ts"
 import {
   PROFISSOES_PREFERIDAS,
   calcularElegibilidade,
   calcularIpr,
   classificarPerfil,
-  decideAttribution,
   decidirStatus,
   gerarResumo,
   isCidadeAtendida,
-  isPlausibleReferralCode,
   mapEstabilidadeProfissional,
   type CidadesAtendidas,
   type IprPesos,
   type IprThresholds,
   type Payload,
   type SofiaIaAtiva,
-  type WhatsappAprovacaoAutomaticaAtiva,
-  type WhatsappFichaAutomaticaAtiva,
 } from "./logic.ts"
 
 const CORS_HEADERS = {
@@ -93,8 +86,6 @@ Deno.serve(async (req) => {
       "ipr_thresholds",
       "cidades_atendidas",
       "sofia_ia_ativa",
-      "whatsapp_aprovacao_automatica_ativa",
-      "whatsapp_ficha_automatica_ativa",
     ])
 
   if (settingsError) {
@@ -106,13 +97,6 @@ Deno.serve(async (req) => {
   const thresholds = settingsMap.ipr_thresholds as IprThresholds
   const cidadesConfig = settingsMap.cidades_atendidas as CidadesAtendidas
   const sofiaIaAtiva = Boolean((settingsMap.sofia_ia_ativa as SofiaIaAtiva | undefined)?.ativa)
-  const whatsappAprovacaoAutomaticaAtiva = Boolean(
-    (settingsMap.whatsapp_aprovacao_automatica_ativa as WhatsappAprovacaoAutomaticaAtiva | undefined)
-      ?.ativa,
-  )
-  const whatsappFichaAutomaticaAtiva = Boolean(
-    (settingsMap.whatsapp_ficha_automatica_ativa as WhatsappFichaAutomaticaAtiva | undefined)?.ativa,
-  )
 
   const cidadeAtendida = isCidadeAtendida(payload.cidade, cidadesConfig)
   // RFC-INTELLIGENCE-006 — idade e WhatsApp, junto com `trabalha`, são gates
@@ -121,7 +105,7 @@ Deno.serve(async (req) => {
   // zerados, e nenhum dos dois entra em `settings.ipr_pesos`.
   const { elegivel, idadeElegivel } = calcularElegibilidade(payload)
   const { total: ipr, breakdown } = calcularIpr(payload, pesos, cidadeAtendida, elegivel)
-  const status = decidirStatus(elegivel, ipr, thresholds)
+  const status = decidirStatus(elegivel, ipr, thresholds, Boolean(payload.instagram))
   const { perfil, motivo } = classificarPerfil(elegivel, ipr, thresholds)
   const recomendacao =
     status === "aprovada" ? "aprovar" : status === "reprovada" ? "reprovar" : "analise_manual"
@@ -264,53 +248,6 @@ Deno.serve(async (req) => {
     })),
   )
 
-  // IMPLEMENTATION-EMBAIXADORAS-E2.8 — atribuição de indicação. Best-effort
-  // total, mesmo padrão dos blocos de Ficha/Meta/WhatsApp abaixo: NUNCA
-  // lança, NUNCA muda a resposta pública, roda pra QUALQUER status (não só
-  // aprovada — a indicação registra a origem da candidatura, independente
-  // do resultado do IPR).
-  //
-  // "Primeira indicação vence, silenciosamente" (decisão de produto
-  // confirmada): o UPSERT abaixo usa `ignoreDuplicates: true` na constraint
-  // UNIQUE de `candidata_telefone_normalizado` (migration 20260915180000)
-  // — se essa candidata já tiver uma indicação (desta ou de outra
-  // Embaixadora), esta tentativa vira no-op silencioso, nunca sobrescreve
-  // `embaixadora_id`/`codigo_referral_usado` da indicação original.
-  //
-  // Nunca revela a existência/validade do código pra fora desta function:
-  // `ref` inexistente, de Embaixadora não-`ativa`, ou telefone que não
-  // normaliza -> simplesmente não atribui nada, sem nenhuma diferença na
-  // resposta ao cliente.
-  if (isPlausibleReferralCode(payload.ref)) {
-    try {
-      const { data: embaixadora, error: embaixadoraError } = await supabase
-        .from("embaixadoras")
-        .select("id")
-        .eq("codigo_referral", payload.ref)
-        .eq("status", "ativa")
-        .maybeSingle()
-      if (embaixadoraError) throw embaixadoraError
-
-      const decisao = decideAttribution({
-        ref: payload.ref,
-        embaixadora: embaixadora ?? null,
-        leadId: lead.id,
-        telefoneNormalizado: normalizeBrazilianPhone(payload.telefone),
-      })
-
-      if (decisao.action === "attempt_insert") {
-        const { error: indicacaoError } = await supabase
-          .from("indicacoes_embaixadoras")
-          .upsert(decisao.row, { onConflict: "candidata_telefone_normalizado", ignoreDuplicates: true })
-        if (indicacaoError) throw indicacaoError
-      }
-    } catch (err) {
-      // Nunca loga o código de indicação nem o telefone — só que a
-      // tentativa falhou, pro técnico investigar sem PII no log.
-      console.error("[finalize-candidate] falha ao processar atribuição de indicação", err)
-    }
-  }
-
   if (status === "aprovada") {
     // Gera o link da Ficha de Aprovação sozinho, mesmo quando a própria IPR
     // já aprova a candidata na hora (sem passar pela equipe no Admin) — sem
@@ -329,40 +266,6 @@ Deno.serve(async (req) => {
         .eq("id", lead.id)
         .is("etapa_pos_aprovacao", null)
 
-      if (whatsappFichaAutomaticaAtiva && payload.whatsapp === true) {
-        const token = Deno.env.get("WHATSAPP_CLOUD_API_TOKEN")
-        const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")
-        const templateName = Deno.env.get("WHATSAPP_FICHA_TEMPLATE_NAME")
-        if (token && phoneNumberId && templateName) {
-          try {
-            const graphApiResponse = await sendWhatsappFichaTemplate({
-              token,
-              phoneNumberId,
-              templateName,
-              telefone: payload.telefone,
-              nome: payload.nome,
-              fichaToken: ficha.token,
-            })
-            await supabase
-              .from("leads_ficha")
-              .update({ whatsapp_enviado_em: new Date().toISOString() })
-              .eq("lead_id", lead.id)
-            // IMPLEMENTATION-015B — registra o wamid pra status de entrega
-            // (sent/delivered/read/failed) poder ser rastreado depois pelo
-            // webhook. Best-effort: nunca derruba o envio que já aconteceu.
-            await recordOutboundWhatsappMessage({
-              supabase,
-              telefone: payload.telefone,
-              templateName,
-              leadId: lead.id,
-              graphApiResponse,
-              messagePurpose: "FICHA_CANDIDATA",
-            })
-          } catch (err) {
-            console.error("[finalize-candidate] falha ao enviar WhatsApp da Ficha", err)
-          }
-        }
-      }
     } catch (err) {
       console.error("[finalize-candidate] falha ao gerar link da Ficha automaticamente", err)
     }
@@ -390,28 +293,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (whatsappAprovacaoAutomaticaAtiva && payload.whatsapp === true) {
-      const token = Deno.env.get("WHATSAPP_CLOUD_API_TOKEN")
-      const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")
-      const templateName = Deno.env.get("WHATSAPP_APPROVAL_TEMPLATE_NAME")
-      if (token && phoneNumberId && templateName) {
-        try {
-          await sendWhatsappApprovalTemplate({
-            token,
-            phoneNumberId,
-            templateName,
-            telefone: payload.telefone,
-            nome: payload.nome,
-          })
-          await supabase
-            .from("leads")
-            .update({ whatsapp_automatico_enviado_em: new Date().toISOString() })
-            .eq("id", lead.id)
-        } catch (err) {
-          console.error("[finalize-candidate] falha ao enviar WhatsApp de aprovação", err)
-        }
-      }
-    }
   }
 
   return jsonResponse({

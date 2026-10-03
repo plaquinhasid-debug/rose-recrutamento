@@ -2,14 +2,13 @@ import { supabase } from "@/lib/supabase"
 import {
   finalizeCandidateResponseSchema,
   getFichaResponseSchema,
-  sofiaConfigResponseSchema,
   type Database,
+  type DocumentoTipo,
+  type FichaDocumento,
   type FichaAprovacaoPayload,
   type FinalizeCandidatePayload,
   type FinalizeCandidateResponse,
   type GetFichaResponse,
-  type KnowledgeSourceModeValue,
-  type NaturalConversationModeValue,
 } from "@tania-joias/shared"
 
 type EventoFunil = Database["public"]["Enums"]["evento_funil"]
@@ -112,101 +111,6 @@ export async function startConversation({
   }
 }
 
-// IMPLEMENTATION-LGPD-001A — contrato minimizado: só o campo/valor que a
-// candidata acabou de responder, nunca o histórico acumulado da conversa
-// (que incluiria nome/telefone/Instagram real sem necessidade para gerar
-// uma reação de 1-3 linhas). Ver `supabase/functions/_shared/sofia-reacao.ts`.
-interface SofiaReacaoParams {
-  intent: "perguntar_proximo" | "fechar"
-  campo: string
-  valor: string
-  proximaPerguntaBase?: string
-}
-
-const SOFIA_REACAO_TIMEOUT_MS = 6000
-
-/**
- * Busca uma reação contextual da Sofia (Edge Function `sofia-reagir`), usada
- * em só 2 pontos da conversa pra ela não soar como formulário. Nunca lança —
- * qualquer falha, timeout ou flag desligada resulta em `null`, e quem chama
- * cai no texto estático do roteiro (`sofia-script.ts`).
- */
-export async function fetchSofiaReacao(params: SofiaReacaoParams): Promise<string | null> {
-  try {
-    const invokePromise = supabase.functions.invoke("sofia-reagir", { body: params })
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("sofia-reagir timeout")), SOFIA_REACAO_TIMEOUT_MS)
-    })
-    const { data, error } = await Promise.race([invokePromise, timeoutPromise])
-    if (error) throw error
-
-    const mensagem = (data as { mensagem?: unknown } | null)?.mensagem
-    return typeof mensagem === "string" && mensagem.trim() ? mensagem.trim() : null
-  } catch (err) {
-    console.warn("[sofia] falha ao buscar reação contextual, usando texto padrão", err)
-    return null
-  }
-}
-
-const SOFIA_CONFIG_TIMEOUT_MS = 4000
-
-/**
- * Busca as flags de comportamento da Sofia (Edge Function `sofia-config`).
- * Chamada uma vez por conversa (`useSofiaFlow.ts`, em `beginIntro`). Nunca
- * lança — qualquer falha, timeout, formato inesperado ou valor desconhecido
- * cai no fail-safe de cada campo (`perguntasIaAtiva: false`,
- * `conducaoNaturalModo: "OFF"`) — sempre o comportamento idêntico ao
- * roteiro fixo de hoje, nunca o oposto.
- *
- * A resposta é validada com `sofiaConfigResponseSchema` (via `.safeParse`,
- * nunca `.parse`) — mesmo se a Edge Function responder 200 com um formato
- * inesperado (deploy antigo, campo faltando, valor fora do enum), o
- * `safeParse` falha sem lançar e o catch abaixo nem chega a rodar; quem
- * decide o fallback aqui é sempre o `success: false` do Zod.
- */
-export async function fetchSofiaConfig(): Promise<{
-  perguntasIaAtiva: boolean
-  /**
-   * `undefined` quando a config não pôde ser lida de verdade (erro, timeout,
-   * formato inesperado — ex.: uma Edge Function antiga sem este campo) —
-   * distinto de um `"OFF"` real vindo do banco. `resolveNaturalConversationMode`
-   * (`orchestrator/naturalConversation/resolveMode.ts`) trata os dois casos
-   * como o mesmo comportamento (nunca reage), mas com `sourceTag` diferente
-   * pro log (Objetivo 9 da Parte 5) — permite diferenciar "configurado como
-   * OFF" de "não deu pra saber, ficou OFF por segurança".
-   */
-  conducaoNaturalModo: NaturalConversationModeValue | undefined
-  knowledgeSourceMode: KnowledgeSourceModeValue
-}> {
-  const FALLBACK = {
-    perguntasIaAtiva: false,
-    conducaoNaturalModo: undefined,
-    knowledgeSourceMode: "SHADOW" as const,
-  }
-  try {
-    const invokePromise = supabase.functions.invoke("sofia-config", { body: {} })
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("sofia-config timeout")), SOFIA_CONFIG_TIMEOUT_MS)
-    })
-    const { data, error } = await Promise.race([invokePromise, timeoutPromise])
-    if (error) throw error
-
-    const parsed = sofiaConfigResponseSchema.safeParse(data)
-    if (!parsed.success) {
-      console.warn("[sofia] resposta de sofia-config em formato inesperado, usando fallback seguro", parsed.error)
-      return FALLBACK
-    }
-
-    return {
-      perguntasIaAtiva: parsed.data.perguntas_ia_ativa,
-      conducaoNaturalModo: parsed.data.conducao_natural_modo,
-      knowledgeSourceMode: parsed.data.knowledge_source_mode ?? "SHADOW",
-    }
-  } catch (err) {
-    console.warn("[sofia] falha ao buscar configuração, usando fallback seguro", err)
-    return FALLBACK
-  }
-}
 
 /**
  * Chama a Edge Function `finalize-candidate`, que calcula o IPR e decide o
@@ -242,4 +146,41 @@ export async function submitFicha(token: string, payload: FichaAprovacaoPayload)
     body: { token, ...payload },
   })
   if (error) throw error
+}
+
+const BUCKET_DOCUMENTOS = "fichas-documentos"
+
+/**
+ * Envia os documentos da ficha. O servidor (`submit-ficha`, ação
+ * `upload_urls`) valida o token da ficha e devolve um link de upload
+ * assinado por arquivo — a candidata nunca tem permissão direta no bucket.
+ */
+export async function uploadDocumentosFicha(
+  token: string,
+  documentos: Partial<Record<DocumentoTipo, File>>,
+): Promise<FichaDocumento[]> {
+  const arquivos = Object.entries(documentos).filter((entry): entry is [DocumentoTipo, File] => Boolean(entry[1]))
+  if (arquivos.length === 0) return []
+
+  const { data, error } = await supabase.functions.invoke("submit-ficha", {
+    body: {
+      action: "upload_urls",
+      token,
+      arquivos: arquivos.map(([tipo, file]) => ({ tipo, nome: file.name, tamanho: file.size })),
+    },
+  })
+  if (error) throw error
+
+  const urls = (data as { uploads: { tipo: DocumentoTipo; path: string; uploadToken: string }[] }).uploads
+  const enviados: FichaDocumento[] = []
+  for (const [tipo, file] of arquivos) {
+    const alvo = urls.find((u) => u.tipo === tipo)
+    if (!alvo) throw new Error(`sem link de upload para ${tipo}`)
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET_DOCUMENTOS)
+      .uploadToSignedUrl(alvo.path, alvo.uploadToken, file, { contentType: file.type || undefined })
+    if (uploadError) throw uploadError
+    enviados.push({ tipo, path: alvo.path })
+  }
+  return enviados
 }

@@ -7,10 +7,50 @@ import { BRAND } from "../_shared/brand.ts"
 // `index.ts` continua sendo o único ponto de I/O (Supabase, Anthropic, Meta,
 // WhatsApp) — nenhum comportamento externo muda com esta extração.
 
-// Profissões que costumam indicar bom encaixe como revendedora (círculo
-// social/atendimento ao público). Sinal positivo para a IA considerar, nunca
-// um filtro obrigatório — a Sofia deve reconhecer profissões semelhantes.
-export const PROFISSOES_PREFERIDAS = ["Cabeleireira", "Professora", "Enfermeira", "Bancária"]
+// Rose: perfis preferidos da Carol (questionário, item 14) — professoras,
+// enfermeiras, quem trabalha em escola/hospital/clínica e área da beleza
+// (cabeleireira, esteticista). Somam o peso `profissao_preferida` no IPR.
+export const PROFISSOES_PREFERIDAS = [
+  "Professora",
+  "Enfermeira / Técnica de enfermagem",
+  "Trabalho em clínica ou hospital",
+  "Cabeleireira",
+  "Esteticista",
+]
+
+// Palavras-chave (sem acento, minúsculas) procuradas na profissão E no local
+// de trabalho. Lista conservadora: só o que a Carol citou.
+const PALAVRAS_PROFISSAO_PREFERIDA = [
+  "professor",
+  "docente",
+  "pedagog",
+  "educador",
+  "escola",
+  "colegio",
+  "creche",
+  "enferm",
+  "hospital",
+  "clinica",
+  "upa",
+  "ubs",
+  "posto de saude",
+  "cabelei",
+  "salao",
+  "estetic",
+]
+
+function normalizarTexto(v: string | undefined): string {
+  return (v ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
+/** `true` quando profissão ou local de trabalho batem com os perfis preferidos da Carol. */
+export function isProfissaoPreferida(profissao: string | undefined, empresaAtual: string | undefined): boolean {
+  const texto = `${normalizarTexto(profissao)} ${normalizarTexto(empresaAtual)}`
+  return PALAVRAS_PROFISSAO_PREFERIDA.some((p) => texto.includes(p))
+}
 
 // RFC-INTELLIGENCE-006 — verdade publicada: 18 anos completos. Idade é gate
 // de elegibilidade, nunca pontuação (não existe em `IprPesos`/`settings.ipr_pesos`).
@@ -53,6 +93,8 @@ export type IprPesos = {
   whatsapp: number
   instagram: number
   cidade_atendida: number
+  /** Rose: bônus pros perfis preferidos. Ausente no banco = 0. */
+  profissao_preferida?: number
 }
 
 export type IprThresholds = { aprovar: number; analise_min: number }
@@ -138,7 +180,14 @@ export function calcularElegibilidade(payload: Payload): {
 
 export function calcularIpr(payload: Payload, pesos: IprPesos, cidadeAtendida: boolean, elegivel: boolean) {
   if (!elegivel) {
-    const zerado = { trabalha: 0, experiencia_vendas: 0, whatsapp: 0, instagram: 0, cidade_atendida: 0 }
+    const zerado = {
+      trabalha: 0,
+      experiencia_vendas: 0,
+      whatsapp: 0,
+      instagram: 0,
+      cidade_atendida: 0,
+      profissao_preferida: 0,
+    }
     return { total: 0, breakdown: zerado }
   }
   const breakdown = {
@@ -147,14 +196,24 @@ export function calcularIpr(payload: Payload, pesos: IprPesos, cidadeAtendida: b
     whatsapp: payload.whatsapp ? pesos.whatsapp : 0,
     instagram: payload.instagram ? pesos.instagram : 0,
     cidade_atendida: cidadeAtendida ? pesos.cidade_atendida : 0,
+    profissao_preferida: isProfissaoPreferida(payload.profissao, payload.empresa_atual)
+      ? (pesos.profissao_preferida ?? 0)
+      : 0,
   }
   const total = Object.values(breakdown).reduce((a, b) => a + b, 0)
   return { total, breakdown }
 }
 
-export function decidirStatus(elegivel: boolean, ipr: number, thresholds: IprThresholds) {
+export function decidirStatus(
+  elegivel: boolean,
+  ipr: number,
+  thresholds: IprThresholds,
+  temInstagram = true,
+) {
   if (!elegivel) return "reprovada" as const
-  if (ipr >= thresholds.aprovar) return "aprovada" as const
+  // Rose: Instagram é obrigatório (questionário, item 23). Sem ele a candidata
+  // nunca é pré-aprovada automaticamente — fica "em análise" pra Carol decidir.
+  if (ipr >= thresholds.aprovar) return temInstagram ? ("aprovada" as const) : ("em_analise" as const)
   if (ipr >= thresholds.analise_min) return "em_analise" as const
   return "reprovada" as const
 }
@@ -231,92 +290,4 @@ export function gerarResumo(
     partes.push(`Possui perfil comercial ${perfil}.`)
   }
   return partes.join(" ")
-}
-
-// =========================================================================
-// EMBAIXADORAS — atribuição de indicação (E2.8)
-//
-// Lógica PURA (sem I/O). A resolução real (código -> Embaixadora ativa,
-// normalização de telefone, UPSERT em indicacoes_embaixadoras) mora em
-// index.ts, que é o único ponto de I/O — mesma disciplina do resto deste
-// arquivo. Nenhuma função aqui decide se uma indicação É válida (isso
-// depende do banco); só decidem se VALE A PENA tentar, e como montar a
-// linha a inserir, de forma auditável e testável sem rede.
-// =========================================================================
-
-/**
- * `false` pra qualquer coisa que não seja uma string não-vazia — nunca
- * gasta uma consulta ao banco pra um `ref` ausente/vazio/só espaço. NUNCA
- * valida formato de verdade (isso seria dar pista pública do formato
- * esperado); a única autoridade real sobre "este código existe e está
- * ativo" é a consulta a `embaixadoras` em index.ts.
- */
-export function isPlausibleReferralCode(ref: string | null | undefined): ref is string {
-  return typeof ref === "string" && ref.trim().length > 0
-}
-
-export interface IndicacaoEmbaixadoraRow {
-  embaixadora_id: string
-  lead_id: string
-  candidata_telefone_normalizado: string
-  codigo_referral_usado: string
-}
-
-/**
- * Projeção explícita campo a campo (nunca spread) — mesma defesa em
- * profundidade já usada em `list-ambassadors-admin/logic.ts`/
- * `get-my-embaixadora/logic.ts`: garante que só estes 4 campos chegam ao
- * INSERT/UPSERT, nunca nenhum campo extra que viesse de um objeto maior por
- * engano. `codigoReferralUsado` é sempre o `ref` ORIGINAL recebido no
- * payload (cópia histórica), nunca um valor normalizado/reescrito.
- */
-export function buildIndicacaoEmbaixadoraRow(params: {
-  embaixadoraId: string
-  leadId: string
-  telefoneNormalizado: string
-  codigoReferralUsado: string
-}): IndicacaoEmbaixadoraRow {
-  return {
-    embaixadora_id: params.embaixadoraId,
-    lead_id: params.leadId,
-    candidata_telefone_normalizado: params.telefoneNormalizado,
-    codigo_referral_usado: params.codigoReferralUsado,
-  }
-}
-
-export type AttributionDecision =
-  | { action: "skip"; reason: "no_ref" | "embaixadora_not_found" | "phone_invalid" }
-  | { action: "attempt_insert"; row: IndicacaoEmbaixadoraRow }
-
-/**
- * Decide SE vale tentar gravar uma indicação, a partir dos resultados já
- * obtidos (consulta a embaixadoras + normalização de telefone) — nunca faz
- * a consulta nem o INSERT/UPSERT em si (isso é I/O, mora em index.ts).
- *
- * O QUE ESTA FUNÇÃO NÃO DECIDE: se duas tentativas concorrentes (ou duas
- * submissões da mesma candidata) colidem no mesmo `candidata_telefone_normalizado`
- * — isso é responsabilidade do UPSERT com `ignoreDuplicates: true` contra a
- * constraint UNIQUE real do banco (migration 20260915180000), autoridade
- * final de "primeira indicação vence, silenciosamente". Testado por
- * inspeção estática de index.ts + da migration, não aqui (não há Postgres
- * de verdade neste ambiente de teste).
- */
-export function decideAttribution(params: {
-  ref: string | null | undefined
-  embaixadora: { id: string } | null
-  leadId: string
-  telefoneNormalizado: { valid: true; e164: string } | { valid: false }
-}): AttributionDecision {
-  if (!isPlausibleReferralCode(params.ref)) return { action: "skip", reason: "no_ref" }
-  if (!params.embaixadora) return { action: "skip", reason: "embaixadora_not_found" }
-  if (!params.telefoneNormalizado.valid) return { action: "skip", reason: "phone_invalid" }
-  return {
-    action: "attempt_insert",
-    row: buildIndicacaoEmbaixadoraRow({
-      embaixadoraId: params.embaixadora.id,
-      leadId: params.leadId,
-      telefoneNormalizado: params.telefoneNormalizado.e164,
-      codigoReferralUsado: params.ref,
-    }),
-  }
 }

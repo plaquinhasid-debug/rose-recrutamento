@@ -1,10 +1,11 @@
+import { BRAND } from "@tania-joias/shared"
 import { useEffect, useState } from "react"
 import type { FichaAprovacaoPayload, GetFichaResponse } from "@tania-joias/shared"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { FichaForm } from "@/components/ficha/FichaForm"
-import { getFicha, submitFicha } from "@/lib/api"
+import { FichaForm, type DocumentosSelecionados } from "@/components/ficha/FichaForm"
+import { getFicha, submitFicha, uploadDocumentosFicha } from "@/lib/api"
 
 interface FichaPageProps {
   token: string
@@ -49,8 +50,9 @@ export function FichaPage({ token }: FichaPageProps) {
     }
   }, [token])
 
-  async function handleSubmit(values: FichaAprovacaoPayload) {
-    await submitFicha(token, values)
+  async function handleSubmit(values: FichaAprovacaoPayload, documentosSelecionados: DocumentosSelecionados) {
+    const documentos = await uploadDocumentosFicha(token, documentosSelecionados)
+    await submitFicha(token, { ...values, documentos })
     setState({ kind: "enviada" })
   }
 
@@ -137,7 +139,7 @@ export function FichaPage({ token }: FichaPageProps) {
           Pra finalizar seu cadastro, preencha as informações abaixo e envie.
         </p>
         <p className="mt-3 rounded-lg bg-gold/10 px-3 py-2 text-sm text-gold-foreground">
-          Os Mostruários são limitados — preencha e envie o quanto antes pra garantir o seu.
+          Assim que recebermos, a {BRAND.dona} analisa e te chama no WhatsApp pra combinar a retirada da sua maleta. 💼
         </p>
       </div>
       <FichaForm onSubmitValues={handleSubmit} />

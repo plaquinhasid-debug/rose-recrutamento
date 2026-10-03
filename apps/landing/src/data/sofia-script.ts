@@ -39,8 +39,8 @@ export const SOFIA_REJECTION_LINES = [
 export const SOFIA_APPROVED_LINES = [
   "Parabéns! 🌸",
   "Você concluiu a primeira etapa e está pré-aprovada!",
-  "Em breve você vai receber um link pelo WhatsApp pra preencher a segunda parte do cadastro — é rápido.",
-  "Depois de confirmado, seu Mostruário já pode ser liberado.",
+  "Em breve nossa equipe vai te chamar no WhatsApp com o link da segunda parte do cadastro — é rápido.",
+  "Depois disso, é só combinar a retirada da sua maleta! 💼",
 ] as const
 
 export const SOFIA_EM_ANALISE_LINES = [
@@ -181,7 +181,9 @@ const idadeWizardSchema = z.coerce
 
 const trabalhaFalso = (answers: SofiaAnswers) => answers.trabalha !== true
 
-/** Roteiro completo, na ordem em que deve ser perguntado. */
+const telefoneWizardSchema = identificacaoSchema.shape.telefone
+
+/** Roteiro da Rose, na ordem em que é perguntado. */
 export const SOFIA_STEPS: SofiaStep[] = [
   {
     key: "nome",
@@ -192,9 +194,10 @@ export const SOFIA_STEPS: SofiaStep[] = [
   },
   {
     key: "cidade",
-    kind: "text",
+    kind: "chips",
     question: "Em qual cidade você mora?",
-    placeholder: "Sua cidade",
+    chips: BRAND.cidadesSugeridas,
+    placeholder: "Ou digite sua cidade",
     schema: identificacaoSchema.shape.cidade,
   },
   {
@@ -207,75 +210,38 @@ export const SOFIA_STEPS: SofiaStep[] = [
   {
     key: "telefone",
     kind: "text",
-    question: "Qual é o seu telefone com DDD?",
-    placeholder: "(11) 91234-5678",
-    schema: identificacaoSchema.shape.telefone,
+    question: "Qual é o seu WhatsApp com DDD?",
+    placeholder: "(11) 99999-9999",
+    schema: telefoneWizardSchema,
   },
   {
     key: "trabalha",
     kind: "yesno",
-    question: "Você trabalha atualmente?",
+    question: "Você trabalha atualmente? (pode ser registrada, autônoma ou com seu próprio negócio)",
     yesLabel: "Sim, trabalho",
     noLabel: "Não trabalho",
   },
   {
     key: "profissao",
-    kind: "text",
-    question: "Profissão?",
-    placeholder: "Sua profissão",
+    kind: "chips",
+    question: "Qual é a sua profissão?",
+    chips: BRAND.profissoesSugeridas,
+    placeholder: "Ou digite sua profissão",
     schema: qualificacaoSchema.shape.profissao,
     skip: trabalhaFalso,
   },
   {
     key: "empresa_atual",
     kind: "text",
-    // Pergunta base — quando a IA contextual estiver ativa (`sofia_ia_ativa`),
-    // esta linha é substituída por uma variante que já reage à profissão
-    // informada no passo anterior (ver `useSofiaFlow.ts`/`sofia-reagir`).
-    // RFC-INTELLIGENCE-006: texto ajustado pra deixar claro que atividade
-    // autônoma/comercial também conta — o campo já aceitava qualquer texto
-    // (nunca foi gate), só a pergunta sugeria "nome de empresa" com força
-    // demais.
-    question: "Me conta rapidinho sobre seu trabalho hoje — pode ser empresa, seu próprio negócio, ou atividade autônoma.",
-    placeholder: "Ex.: nome da empresa, ou 'trabalho por conta própria'",
+    question: "Onde você trabalha hoje? Pode ser o nome da empresa, escola, clínica, salão ou \"por conta própria\".",
+    placeholder: "Ex.: Escola Municipal X, ou 'por conta própria'",
     schema: qualificacaoSchema.shape.empresa_atual,
-    skip: trabalhaFalso,
-  },
-  {
-    // QUALIFICACAO-002, Parte 1 — coleta estruturada de "estabilidade
-    // profissional" (regularidade da atividade AUTODECLARADA, não é medida
-    // de risco/garantia). Mesmo padrão de `tempo_disponivel`: chips com
-    // fallback de texto livre. A normalização do texto do chip pra
-    // ALTA/MEDIA/BAIXA acontece só em `finalize-candidate` — este passo
-    // NUNCA participa de calcularIpr/decidirStatus/classificarPerfil.
-    key: "estabilidade_profissional",
-    kind: "chips",
-    question: "Sua rotina de trabalho hoje é mais fixa, ou mais variável?",
-    chips: ["Fixa — mesma empresa/local, mesma escala", "Variável, mas recorrente", "Esporádica, sem muita regularidade"],
-    placeholder: "Ou descreva com suas palavras",
-    schema: qualificacaoSchema.shape.estabilidade_profissional,
     skip: trabalhaFalso,
   },
   {
     key: "experiencia_vendas",
     kind: "yesno",
-    question: "Você já trabalhou com vendas?",
-    yesLabel: "Sim",
-    noLabel: "Não",
-    skip: trabalhaFalso,
-  },
-  {
-    key: "whatsapp",
-    kind: "yesno",
-    question: "O telefone informado possui WhatsApp?",
-    yesLabel: "Sim",
-    noLabel: "Não",
-    skip: trabalhaFalso,
-  },
-  {
-    key: "possui_instagram",
-    kind: "yesno",
-    question: "Você possui Instagram?",
+    question: "Você já vendeu alguma coisa antes? (roupas, cosméticos, joias, vendas online...)",
     yesLabel: "Sim",
     noLabel: "Não",
     skip: trabalhaFalso,
@@ -283,30 +249,15 @@ export const SOFIA_STEPS: SofiaStep[] = [
   {
     key: "instagram",
     kind: "text",
-    // Auditoria set/2026 — a pergunta central ("Qual é o seu @ do Instagram?")
-    // é preservada, mas agora traz uma saída explícita: a candidata que não
-    // tiver/não lembrar escreve "não tenho" e o fluxo segue sem Instagram, em
-    // vez de ficar re-perguntando (ver `isInstagramSkipSignal` e o tratamento
-    // desta etapa em `useSofiaFlow.ts`).
-    question:
-      'Qual é o seu @ do Instagram?\n\nSe você não tiver ou não lembrar agora, é só escrever "não tenho" que a gente segue sem.',
-    placeholder: '@seuusuario (ou "não tenho")',
+    question: 'Qual é o seu @ do Instagram?\n\nEle é importante pra gente te conhecer melhor. Se não tiver, escreva "não tenho".',
+    placeholder: "@seuusuario",
     schema: instagramHandleSchema,
-    skip: (answers) => trabalhaFalso(answers) || answers.possui_instagram !== true,
-  },
-  {
-    key: "tempo_disponivel",
-    kind: "chips",
-    question: "Quanto tempo você pode dedicar por dia?",
-    chips: ["1 hora", "2 horas", "3+ horas"],
-    placeholder: "Ou digite outro valor",
-    schema: qualificacaoSchema.shape.tempo_disponivel,
     skip: trabalhaFalso,
   },
   {
     key: "objetivo",
     kind: "textarea",
-    question: `Por que você deseja trabalhar com a ${BRAND.nome}?`,
+    question: `Por último: por que você quer revender com a ${BRAND.nome}?`,
     placeholder: "Conte um pouco sobre o seu objetivo...",
     schema: qualificacaoSchema.shape.objetivo,
     skip: trabalhaFalso,

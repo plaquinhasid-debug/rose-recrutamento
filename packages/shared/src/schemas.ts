@@ -168,6 +168,25 @@ export type SofiaConfigResponse = z.infer<typeof sofiaConfigResponseSchema>
  * duplicação do resto deste arquivo, já que Edge Functions não importam
  * `@tania-joias/shared`).
  */
+export const DOCUMENTO_TIPOS = ["documento_frente", "documento_verso", "comprovante_residencia"] as const
+export type DocumentoTipo = (typeof DOCUMENTO_TIPOS)[number]
+export const DOCUMENTO_TIPO_LABEL: Record<DocumentoTipo, string> = {
+  documento_frente: "RG ou CNH (frente)",
+  documento_verso: "RG ou CNH (verso)",
+  comprovante_residencia: "Comprovante de residência",
+}
+
+export const fichaDocumentoSchema = z.object({
+  tipo: z.enum(DOCUMENTO_TIPOS),
+  path: z.string().min(1),
+})
+export type FichaDocumento = z.infer<typeof fichaDocumentoSchema>
+
+/**
+ * Ficha da Rose — preenchida pela própria candidata via link único
+ * (`/ficha/:token`), depois de pré-aprovada. Validada no cliente e de novo no
+ * servidor (`submit-ficha`, que replica estas regras manualmente).
+ */
 export const fichaAprovacaoSchema = z
   .object({
     endereco_rua: z.string().trim().min(1, "Informe a rua"),
@@ -175,50 +194,50 @@ export const fichaAprovacaoSchema = z
     endereco_bairro: z.string().trim().min(1, "Informe o bairro"),
     endereco_cidade: z.string().trim().min(1, "Informe a cidade"),
     endereco_cep: z.string().trim().min(1, "Informe o CEP"),
+    casa_propria: z.enum(["propria", "alugada", "familia"], {
+      errorMap: () => ({ message: "Escolha uma opção" }),
+    }),
 
-    nome_pai: z.string().trim().min(1, "Informe o nome do pai"),
-    nome_mae: z.string().trim().min(1, "Informe o nome da mãe"),
-
-    // Contato extra pra localizar a revendedora caso ela suma — mesmo
-    // motivo dos campos de trabalho do companheiro logo abaixo.
     trabalha_atualmente: z.boolean().optional(),
     trabalho_endereco: z.string().trim().optional(),
     trabalho_telefone: z.string().trim().optional(),
+    trabalho_horario: z.string().trim().optional(),
 
     tem_conjuge: z.boolean(),
     conjuge_nome: z.string().trim().optional(),
     conjuge_telefone: z.string().trim().optional(),
-    // Contato extra pra localizar a revendedora caso ela suma — só faz
-    // sentido perguntar quando `tem_conjuge` é true.
     conjuge_trabalha: z.boolean().optional(),
     conjuge_trabalho_local: z.string().trim().optional(),
     conjuge_trabalho_telefone: z.string().trim().optional(),
+
+    filhos_quantidade: z.coerce
+      .number({ invalid_type_error: "Informe um número (0 se não tiver)" })
+      .int("Informe um número inteiro")
+      .min(0, "Informe um número (0 se não tiver)")
+      .max(20, "Confira o número"),
+
+    instagram_profissional: z.string().trim().optional(),
+    restricao_cpf: z.enum(["nao", "sim", "nao_sei"], {
+      errorMap: () => ({ message: "Escolha uma opção" }),
+    }),
 
     ref1_nome: z.string().trim().min(1, "Informe o nome"),
     ref1_telefone: z.string().trim().min(1, "Informe o telefone"),
     ref2_nome: z.string().trim().min(1, "Informe o nome"),
     ref2_telefone: z.string().trim().min(1, "Informe o telefone"),
-    ref3_nome: z.string().trim().min(1, "Informe o nome"),
-    ref3_telefone: z.string().trim().min(1, "Informe o telefone"),
 
-    ref_comercial_o_que_vende: z.string().trim().min(1, "Conte o que você vende"),
-    ref_comercial_nome: z.string().trim().min(1, "Informe o nome"),
-    ref_comercial_telefone: z.string().trim().min(1, "Informe o telefone"),
+    /** Preenchido pela página depois do upload (nunca digitado). */
+    documentos: z.array(fichaDocumentoSchema).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.trabalha_atualmente && !data.trabalho_endereco?.trim()) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["trabalho_endereco"],
-        message: "Informe o endereço do trabalho",
-      })
+      ctx.addIssue({ code: "custom", path: ["trabalho_endereco"], message: "Informe o endereço do trabalho" })
     }
     if (data.trabalha_atualmente && !data.trabalho_telefone?.trim()) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["trabalho_telefone"],
-        message: "Informe o telefone do trabalho",
-      })
+      ctx.addIssue({ code: "custom", path: ["trabalho_telefone"], message: "Informe o telefone do trabalho" })
+    }
+    if (data.trabalha_atualmente && !data.trabalho_horario?.trim()) {
+      ctx.addIssue({ code: "custom", path: ["trabalho_horario"], message: "Informe seu horário de trabalho" })
     }
     if (data.tem_conjuge && !data.conjuge_nome?.trim()) {
       ctx.addIssue({ code: "custom", path: ["conjuge_nome"], message: "Informe o nome dele" })
@@ -227,18 +246,10 @@ export const fichaAprovacaoSchema = z
       ctx.addIssue({ code: "custom", path: ["conjuge_telefone"], message: "Informe o telefone dele" })
     }
     if (data.tem_conjuge && data.conjuge_trabalha && !data.conjuge_trabalho_local?.trim()) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["conjuge_trabalho_local"],
-        message: "Informe onde ele trabalha",
-      })
+      ctx.addIssue({ code: "custom", path: ["conjuge_trabalho_local"], message: "Informe onde ele trabalha" })
     }
     if (data.tem_conjuge && data.conjuge_trabalha && !data.conjuge_trabalho_telefone?.trim()) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["conjuge_trabalho_telefone"],
-        message: "Informe o telefone do trabalho",
-      })
+      ctx.addIssue({ code: "custom", path: ["conjuge_trabalho_telefone"], message: "Informe o telefone do trabalho" })
     }
   })
 export type FichaAprovacaoPayload = z.infer<typeof fichaAprovacaoSchema>
