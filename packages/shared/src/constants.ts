@@ -141,31 +141,38 @@ export interface PipelineColumn {
   groupKeys?: PipelineColumnKey[]
 }
 
-// Rose: CRM enxuto com 5 colunas. Os valores reais do banco continuam os
-// mesmos (status + etapa_pos_aprovacao); só a exibição agrupa.
+// Rose: CRM com 6 colunas. Os valores reais do banco continuam os mesmos
+// (status + etapa_pos_aprovacao); só a exibição agrupa.
+// Automático: 1 (Sofia aprovou), 2 (Sofia: em análise), 3 (clicou "Enviar
+// ficha no WhatsApp"), 4 (candidata enviou a ficha), 6 (Sofia reprovou).
+// Manual (arrastar): 5 e 6 — decisão da dona.
 export const PIPELINE_COLUMNS: PipelineColumn[] = [
   {
-    key: "novo",
-    label: "Novas candidatas",
-    color: LEAD_STATUS_COLOR.novo,
-    groupKeys: ["em_analise"],
+    key: "aprovada",
+    label: "Novas Candidatas Aprovadas na Página",
+    color: LEAD_STATUS_COLOR.aprovada,
+  },
+  {
+    key: "em_analise",
+    label: "Em análise",
+    color: LEAD_STATUS_COLOR.em_analise,
+    groupKeys: ["novo"],
   },
   {
     key: "contatada",
-    label: "Pré-aprovada · enviar ficha",
+    label: "Ficha Enviada",
     color: ETAPA_POS_APROVACAO_COLOR.contatada,
-    groupKeys: ["aprovada"],
   },
   {
     key: "confirmada",
-    label: `Ficha recebida · ${BRAND.dona} decide`,
+    label: "Candidatas que Preencheram as Fichas",
     color: ETAPA_POS_APROVACAO_COLOR.aguardando_tania,
     groupKeys: ["aguardando_tania"],
   },
-  { key: "ativa", label: "Ativa · pegou a maleta", color: ETAPA_POS_APROVACAO_COLOR.ativa },
+  { key: "ativa", label: `${BRAND.dona} Aprovou`, color: ETAPA_POS_APROVACAO_COLOR.ativa },
   {
     key: "desistiu",
-    label: "Não seguiu",
+    label: `${BRAND.dona} Recusou`,
     color: ETAPA_POS_APROVACAO_COLOR.desistiu,
     groupKeys: ["reprovada"],
   },
@@ -177,14 +184,24 @@ export const PIPELINE_COLUMNS: PipelineColumn[] = [
  * informação não se perde, só sai da largura de uma coluna inteira.
  */
 export const ETAPA_DETALHE_LABEL: Partial<Record<PipelineColumnKey, string>> = {
-  em_analise: "Em análise",
-  aprovada: "Ficha ainda não gerada",
-  reprovada: "Não passou na pré-qualificação",
+  novo: "Cadastro incompleto",
+  reprovada: "Reprovada pela Sofia",
 }
 
 interface LeadForPipeline {
   status: LeadStatus
   etapa_pos_aprovacao: EtapaPosAprovacao | null
+  leads_ficha?: { contato_manual_em: string | null; preenchido_em: string | null }[]
+}
+
+/**
+ * Rose: o servidor marca "contatada" assim que gera o link da ficha (na
+ * aprovação). Enquanto a equipe não enviar/copiar o link, o card continua
+ * visualmente em "Novas Candidatas Aprovadas na Página".
+ */
+function fichaGeradaMasNaoEnviada(lead: LeadForPipeline): boolean {
+  const ficha = lead.leads_ficha?.[0]
+  return Boolean(ficha && !ficha.contato_manual_em && !ficha.preenchido_em)
 }
 
 /** Em qual etapa real (banco) uma lead está, combinando `status` + `etapa_pos_aprovacao`. */
@@ -197,7 +214,10 @@ export function pipelineColumnKeyForLead(lead: LeadForPipeline): PipelineColumnK
 
 /** Em qual coluna visual do Kanban uma lead cai, já aplicando os agrupamentos de `groupKeys`. */
 export function displayColumnKeyForLead(lead: LeadForPipeline): PipelineColumnKey {
-  const realKey = pipelineColumnKeyForLead(lead)
+  const realKey =
+    pipelineColumnKeyForLead(lead) === "contatada" && fichaGeradaMasNaoEnviada(lead)
+      ? "aprovada"
+      : pipelineColumnKeyForLead(lead)
   const column = PIPELINE_COLUMNS.find(
     (col) => col.key === realKey || col.groupKeys?.includes(realKey),
   )

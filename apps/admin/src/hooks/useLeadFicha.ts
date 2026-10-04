@@ -105,7 +105,10 @@ export async function markManualContact(fichaId: string): Promise<LeadFicha> {
     .select("*")
     .maybeSingle()
   if (error) throw error
-  if (data) return data
+  if (data) {
+    await moverParaFichaEnviada(data.lead_id)
+    return data
+  }
 
   // 0 linhas afetadas = já tinha contato_manual_em preenchido; devolve o
   // valor real já gravado, sem sobrescrever.
@@ -116,6 +119,22 @@ export async function markManualContact(fichaId: string): Promise<LeadFicha> {
     .single()
   if (fetchError) throw fetchError
   return existing
+}
+
+/**
+ * Rose: ficha enviada (WhatsApp ou link copiado) → card vai pra "Ficha
+ * Enviada". Vale pra aprovada pela Sofia e pra "Em análise" (mandar a ficha a
+ * uma candidata em análise = a equipe decidiu seguir com ela). Nunca puxa pra
+ * trás um card que já avançou além de "Ficha Enviada".
+ */
+async function moverParaFichaEnviada(leadId: string): Promise<void> {
+  const { error } = await supabase
+    .from("leads")
+    .update({ status: "aprovada", etapa_pos_aprovacao: "contatada" })
+    .eq("id", leadId)
+    .in("status", ["aprovada", "em_analise", "novo"])
+    .or("etapa_pos_aprovacao.is.null,etapa_pos_aprovacao.eq.contatada")
+  if (error) console.warn("[ficha] falha ao mover card pra Ficha Enviada", error)
 }
 
 export function useMarkManualContact() {

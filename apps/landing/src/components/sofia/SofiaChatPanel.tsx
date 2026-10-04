@@ -1,3 +1,4 @@
+import { BRAND } from "@tania-joias/shared"
 import { ChatTranscript } from "@/components/sofia/ChatTranscript"
 import { ErrorScreen } from "@/components/sofia/ErrorScreen"
 import { LoadingScreen } from "@/components/sofia/LoadingScreen"
@@ -46,7 +47,7 @@ export function SofiaChatPanel({ flow, onClose }: SofiaChatPanelProps) {
           <div>
             <SheetTitle className="font-sans text-[var(--wa-header-foreground)]">Sofia</SheetTitle>
             <SheetDescription className="text-[var(--wa-header-foreground)]/80">
-              Assistente virtual · Tania Joias
+              Assistente virtual · {BRAND.nome}
             </SheetDescription>
           </div>
         </div>

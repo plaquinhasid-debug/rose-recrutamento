@@ -23,7 +23,7 @@ function Shell({ children }: React.PropsWithChildren) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 py-5 text-center">
-        <span className="font-display text-lg font-semibold tracking-wide">Tania Joias</span>
+        <span className="font-display text-lg font-semibold tracking-wide">{BRAND.nomeCurto}</span>
       </header>
       <main className="mx-auto max-w-xl px-6 py-10">{children}</main>
     </div>

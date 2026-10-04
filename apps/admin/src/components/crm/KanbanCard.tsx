@@ -32,7 +32,7 @@ export function KanbanCard({ lead, onClick }: KanbanCardProps) {
 
   const fichaStatus = fichaStatusForLead(lead)
   const pendente = fichaPendente(lead)
-  const semFicha = lead.status === "aprovada" && lead.leads_ficha.length === 0
+  const semFicha = (lead.status === "aprovada" || lead.status === "em_analise") && lead.leads_ficha.length === 0
   const semInstagram = !lead.instagram
 
   function handleGerarFicha(event: MouseEvent) {
@@ -57,6 +57,10 @@ export function KanbanCard({ lead, onClick }: KanbanCardProps) {
     if (!pendente) return
     void navigator.clipboard.writeText(fichaLinkUrl(pendente.token))
     toast.success("Link da ficha copiado")
+    // Rose: copiar o link pra mandar também move o card pra "Ficha Enviada".
+    if (!pendente.contato_manual_em && !markContact.isPending) {
+      markContact.mutate(pendente.id)
+    }
   }
 
   return (

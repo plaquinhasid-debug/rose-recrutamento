@@ -22,6 +22,7 @@ import {
 import { KanbanColumn } from "@/components/crm/KanbanColumn"
 import { KanbanCard } from "@/components/crm/KanbanCard"
 import { useUpdateLead } from "@/hooks/useLeadDetail"
+import { useMarkManualContact } from "@/hooks/useLeadFicha"
 import type { LeadWithAnalysis } from "@/hooks/useLeads"
 import type { Lead } from "@/types"
 
@@ -46,6 +47,7 @@ export function KanbanBoard({ leads, onSelectLead }: KanbanBoardProps) {
   const [grouped, setGrouped] = React.useState<GroupedLeads>(() => groupByColumn(leads))
   const [activeLead, setActiveLead] = React.useState<LeadWithAnalysis | null>(null)
   const updateLead = useUpdateLead()
+  const markContact = useMarkManualContact()
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
   // O board tem mais colunas do que cabem na tela — sem isso, quem só tem
@@ -115,6 +117,29 @@ export function KanbanBoard({ leads, onSelectLead }: KanbanBoardProps) {
     if (!lead) return
 
     const patch = patchForPipelineColumn(targetKey, lead.status)
+
+    // Rose: arrastar pra "Ficha Enviada" = a equipe mandou a ficha. Registra o
+    // envio (é isso que tira o card da 1ª coluna) e move status/etapa juntos.
+    const fichaPendenteNaoEnviada = lead.leads_ficha[0]
+    if (
+      targetKey === "contatada" &&
+      fichaPendenteNaoEnviada &&
+      !fichaPendenteNaoEnviada.contato_manual_em &&
+      !fichaPendenteNaoEnviada.preenchido_em
+    ) {
+      setGrouped((prev) => ({
+        ...prev,
+        [sourceKey]: prev[sourceKey].filter((l) => l.id !== leadId),
+        [targetKey]: [lead, ...prev[targetKey]],
+      }))
+      markContact.mutate(fichaPendenteNaoEnviada.id, {
+        onError: () => {
+          toast.error("Não foi possível mover o lead. Tente novamente.")
+          setGrouped(groupByColumn(leads))
+        },
+      })
+      return
+    }
 
     setGrouped((prev) => ({
       ...prev,
