@@ -80,7 +80,11 @@ export function SofiaAssistant({ open, onOpenChange }: SofiaAssistantProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="gap-0 p-0">
+      <SheetContent
+        side="right"
+        className="gap-0 p-0"
+        closeClassName="top-4 text-white/90 hover:bg-white/15 hover:text-white"
+      >
         <SofiaChatPanel flow={flow} onClose={() => onOpenChange(false)} />
       </SheetContent>
     </Sheet>

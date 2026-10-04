@@ -56,7 +56,7 @@ export function QuemSomos({ onOpenSofia }: QuemSomosProps) {
             conquistar mais renda sem abrir mão da sua rotina.
           </p>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Trabalhamos com consignação: você pega o mostruário de semijoias premium, vende em
+            Trabalhamos com consignação: você retira a maleta de semijoias premium, vende em
             30 dias e faz o acerto. Sem comprar estoque, sem risco — e com suporte da Carol em
             cada etapa.
           </p>

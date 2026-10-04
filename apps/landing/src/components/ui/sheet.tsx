@@ -41,6 +41,7 @@ interface SheetContentProps
   extends React.ComponentProps<typeof DialogPrimitive.Content> {
   side?: "right" | "bottom"
   showCloseButton?: boolean
+  closeClassName?: string
 }
 
 function SheetContent({
@@ -48,6 +49,7 @@ function SheetContent({
   children,
   side = "right",
   showCloseButton = true,
+  closeClassName,
   ...props
 }: SheetContentProps) {
   const isRight = side === "right"
@@ -59,7 +61,7 @@ function SheetContent({
         className={cn(
           "fixed z-50 flex flex-col bg-background shadow-2xl outline-none",
           isRight &&
-            "inset-y-0 right-0 h-full w-full border-l border-border sm:max-w-md data-[state=open]:animate-sheet-slide-in-right data-[state=closed]:animate-sheet-slide-out-right",
+            "inset-y-0 right-0 h-full max-h-dvh w-full border-l border-border sm:max-w-md data-[state=open]:animate-sheet-slide-in-right data-[state=closed]:animate-sheet-slide-out-right",
           side === "bottom" &&
             "inset-x-0 bottom-0 max-h-[88vh] rounded-t-2xl border-t border-border data-[state=open]:animate-sheet-slide-in-bottom data-[state=closed]:animate-sheet-slide-out-bottom",
           className,
@@ -70,9 +72,12 @@ function SheetContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="sheet-close-x"
-            className="absolute right-4 top-4 z-10 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={cn(
+              "absolute right-2 top-2 z-10 flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              closeClassName,
+            )}
           >
-            <X className="size-4" />
+            <X className="size-5" />
             <span className="sr-only">Fechar</span>
           </DialogPrimitive.Close>
         )}

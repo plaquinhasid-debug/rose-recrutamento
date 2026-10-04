@@ -19,7 +19,7 @@ export function ChipsAnswerInput({ step, disabled, onSubmitValue }: ChipsAnswerI
             disabled={disabled}
             onClick={() => onSubmitValue(chip, chip)}
             className={cn(
-              "rounded-full border border-[var(--wa-header)] bg-white px-4 py-1.5 text-sm font-medium text-[var(--wa-header)] transition-colors",
+              "rounded-full border border-[var(--wa-header)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--wa-header)] transition-colors",
               "hover:bg-[var(--wa-header)]/10",
               "disabled:pointer-events-none disabled:opacity-50",
             )}

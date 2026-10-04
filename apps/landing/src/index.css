@@ -1,34 +1,44 @@
 @import "tailwindcss";
+@import "@fontsource/jost/400.css";
+@import "@fontsource/jost/500.css";
+@import "@fontsource/jost/600.css";
+@import "@fontsource/cormorant-garamond/500.css";
+@import "@fontsource/cormorant-garamond/600.css";
+@import "@fontsource/cormorant-garamond/500-italic.css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 
-  /* Rose Semi Jóias — identidade visual: marfim / dourado / marrom-carvão (design-guide.md) */
-  --background: oklch(0.97 0.012 80);
-  --foreground: oklch(0.24 0.02 50);
+  /* Rose Semi Jóias — identidade tirada do logo: papel blush, rose gold
+     (do champanhe ao cobre) e cacau-rosé nos títulos. */
+  --background: #fbf3f1; /* blush */
+  --foreground: #4a2c29; /* cacau-rosé */
 
-  --card: oklch(0.995 0.006 80);
-  --card-foreground: oklch(0.24 0.02 50);
+  --card: #fffaf8;
+  --card-foreground: #4a2c29;
 
-  --popover: oklch(0.995 0.006 80);
-  --popover-foreground: oklch(0.24 0.02 50);
+  --popover: #fffaf8;
+  --popover-foreground: #4a2c29;
 
-  --primary: oklch(0.53 0.12 75);
-  --primary-foreground: oklch(0.98 0.01 80);
+  --primary: #9c5c53; /* rose gold escuro (botões, texto branco AA) */
+  --primary-foreground: #fffaf8;
 
-  --secondary: oklch(0.94 0.015 78);
-  --secondary-foreground: oklch(0.3 0.03 60);
+  --secondary: #f5e4df; /* pétala */
+  --secondary-foreground: #4a2c29;
 
-  --muted: oklch(0.94 0.015 78);
-  --muted-foreground: oklch(0.5 0.02 55);
+  --muted: #f5e4df;
+  --muted-foreground: #74534e;
 
-  --accent: oklch(0.94 0.035 78);
-  --accent-foreground: oklch(0.4 0.08 70);
+  --accent: #f3dcd5;
+  --accent-foreground: #7c443d;
 
-  --gold: oklch(0.53 0.12 75);
-  --gold-foreground: oklch(0.98 0.01 80);
+  --gold: #9c5c53;
+  --gold-foreground: #fffaf8;
+
+  --champagne: #e3b4a4; /* filetes e detalhes finos */
+  --wine: #5a302c; /* faixa final */
 
   --destructive: oklch(0.55 0.15 25);
   --destructive-foreground: oklch(0.98 0 0);
@@ -36,9 +46,9 @@
   --success: oklch(0.58 0.09 145);
   --success-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.89 0.012 75);
-  --input: oklch(0.89 0.012 75);
-  --ring: oklch(0.53 0.12 75);
+  --border: #ecd5cf;
+  --input: #ecd5cf;
+  --ring: #b97a6d;
 
   /* Chat da Sofia — paleta inspirada no WhatsApp, isolada do tema geral
      (preto/dourado) do site. Usada só dentro de components/sofia/*. */
@@ -99,6 +109,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-gold: var(--gold);
   --color-gold-foreground: var(--gold-foreground);
+  --color-champagne: var(--champagne);
+  --color-wine: var(--wine);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
@@ -112,7 +124,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
 
   /* Animações usadas pelos primitivos (Radix Presence detecta e aguarda
@@ -230,5 +242,51 @@
   40% {
     transform: translateY(-4px);
     opacity: 1;
+  }
+}
+
+/* Rose gold "foil" — o mesmo degradê do logo, do champanhe ao cobre. */
+@utility text-foil {
+  background-image: linear-gradient(115deg, #b97464 0%, #9c5c53 50%, #7a413a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility bg-foil {
+  background-image: linear-gradient(115deg, #b0705f 0%, #9c5c53 50%, #84463f 100%);
+}
+
+/* Entradas suaves sem JS pesado (Reveal e topo da página). */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 24px));
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: rise-in 0.7s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .rise-in {
+    animation: none;
   }
 }

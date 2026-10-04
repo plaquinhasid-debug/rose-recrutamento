@@ -1,6 +1,5 @@
 import { useEffect } from "react"
 
-import { logEvent } from "@/lib/api"
 import { hasLoggedOnce, markLoggedOnce } from "@/lib/tracking"
 import type { UtmParams } from "@/lib/tracking"
 
@@ -15,6 +14,10 @@ export function useLandingTracking(sessionId: string, utm: UtmParams): void {
     // `/ficha/:token` é uma página pós-aprovação separada, não o topo do
     // funil — não deve contar como `landing_view`/`ad_click`.
     if (window.location.pathname.startsWith("/ficha/")) return
+
+    // O cliente do Supabase só é baixado depois que a página aparece.
+    const logEvent: typeof import("@/lib/api").logEvent = (params) =>
+      import("@/lib/api").then((m) => m.logEvent(params))
 
     if (!hasLoggedOnce("landing_view")) {
       markLoggedOnce("landing_view")

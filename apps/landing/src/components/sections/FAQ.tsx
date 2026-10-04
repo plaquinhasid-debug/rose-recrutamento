@@ -11,7 +11,7 @@ const FAQ_ITEMS = [
   {
     question: "Como funciona? Preciso comprar estoque?",
     answer:
-      `Não! A ${BRAND.nome} trabalha no sistema de consignação. Você recebe o mostruário com as peças, vende durante 30 dias e depois vem até a loja para fazer o acerto: paga só o que vendeu e devolve o restante. Sem investimento inicial e sem risco.`,
+      `Não! A ${BRAND.nome} trabalha no sistema de consignação. Você recebe a maleta com as peças, vende durante 30 dias e depois vem até a loja para fazer o acerto: paga só o que vendeu e devolve o restante. Sem investimento inicial e sem risco.`,
   },
   {
     question: "Qual é a comissão que vou ganhar?",
@@ -19,14 +19,14 @@ const FAQ_ITEMS = [
       "A comissão começa em 30% e pode chegar a 50% conforme o seu volume de vendas. Quanto mais você vende, maior a sua porcentagem. Tudo combinado com transparência na hora do acerto.",
   },
   {
-    question: "Quantas peças recebo no primeiro mostruário?",
+    question: "Quantas peças vêm na primeira maleta?",
     answer:
-      "No primeiro mostruário você recebe cerca de 50 peças. São semijoias selecionadas para facilitar a sua apresentação para as clientes, incluindo brincos, anéis, colares e pulseiras.",
+      "Na primeira maleta você recebe cerca de 50 peças. São semijoias selecionadas para facilitar a sua apresentação para as clientes, incluindo brincos, anéis, colares e pulseiras.",
   },
   {
     question: "Com que frequência faço o acerto?",
     answer:
-      `O acerto é feito uma vez por mês, 30 dias após pegar o mostruário. Você vem até a ${BRAND.nome}, apresenta o que vendeu, faz o pagamento e pode renovar as peças.`,
+      `O acerto é feito uma vez por mês, 30 dias após retirar a maleta. Você vem até a ${BRAND.nome}, apresenta o que vendeu, faz o pagamento e pode renovar as peças.`,
   },
   {
     question: "Preciso ter experiência com vendas?",
@@ -61,7 +61,7 @@ const FAQ_ITEMS = [
   {
     question: "O que acontece depois que sou aprovada?",
     answer:
-      `Após a pré-aprovação, a ${BRAND.dona} entra em contato pelo WhatsApp para dar os próximos passos. Você vai preencher uma ficha completa, enviar documentos (RG e comprovante de residência) e, depois, pegar o seu primeiro mostruário.`,
+      `Após a pré-aprovação, a ${BRAND.dona} entra em contato pelo WhatsApp para dar os próximos passos. Você vai preencher uma ficha completa, enviar documentos (RG e comprovante de residência) e, depois, retirar a sua primeira maleta.`,
   },
 ]
 

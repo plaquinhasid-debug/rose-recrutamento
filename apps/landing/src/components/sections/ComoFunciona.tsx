@@ -8,8 +8,8 @@ interface ComoFuncionaProps {
 const STEPS = [
   {
     number: "01",
-    title: "Candidatura rápida",
-    text: "Converse com a Sofia, nossa assistente, e conte um pouco sobre você. Leva menos de 2 minutos.",
+    title: "Faça seu cadastro em 2 minutos",
+    text: "Responda algumas perguntas rápidas da Sofia, nossa assistente, direto pelo celular. Sem compromisso e sem pagar nada.",
   },
   {
     number: "02",
@@ -18,8 +18,8 @@ const STEPS = [
   },
   {
     number: "03",
-    title: "Pegue o mostruário",
-    text: "Aprovada! Você vem até a loja, conhece a Carol e sai com ~50 peças no sistema de consignação — sem pagar nada antecipado.",
+    title: "Retire sua maleta",
+    text: "Aprovada! Você vem até a loja, conhece a Carol e leva sua maleta com cerca de 50 peças em consignação — sem pagar nada antes.",
   },
   {
     number: "04",
@@ -45,7 +45,7 @@ export function ComoFunciona({ onOpenSofia }: ComoFuncionaProps) {
           {STEPS.map((step, index) => (
             <Reveal key={step.number} delay={index * 0.1} className="relative">
               <div className="flex flex-col gap-3">
-                <span className="font-display text-4xl font-semibold text-gold/70">
+                <span className="text-foil font-display text-5xl font-medium leading-none">
                   {step.number}
                 </span>
                 <h3 className="font-medium text-foreground">{step.title}</h3>

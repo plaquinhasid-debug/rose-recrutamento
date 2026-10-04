@@ -138,7 +138,7 @@ export function FichaPage({ token }: FichaPageProps) {
         <p className="mt-1 text-sm text-muted-foreground">
           Pra finalizar seu cadastro, preencha as informações abaixo e envie.
         </p>
-        <p className="mt-3 rounded-lg bg-gold/10 px-3 py-2 text-sm text-gold-foreground">
+        <p className="mt-3 rounded-lg bg-gold/10 px-3 py-2 text-sm text-primary">
           Assim que recebermos, a {BRAND.dona} analisa e te chama no WhatsApp pra combinar a retirada da sua maleta. 💼
         </p>
       </div>

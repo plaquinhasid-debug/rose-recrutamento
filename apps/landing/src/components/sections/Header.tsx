@@ -9,12 +9,11 @@ const NAV_LINKS = [
 export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <a
-          href="#top"
-          className="shrink-0 font-display text-lg font-semibold tracking-wide text-foreground sm:text-xl"
-        >
-          {BRAND.nomeCurto}
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6">
+        <a href="#top" className="shrink-0" aria-label={`${BRAND.nome} — início`}>
+          <img src="/assets/rose-logo.webp"
+            width={240}
+            height={112} alt={BRAND.nome} className="h-12 w-auto sm:h-14" />
         </a>
 
         <nav className="hidden items-center gap-8 lg:flex">
