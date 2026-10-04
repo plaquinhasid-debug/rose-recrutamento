@@ -37,15 +37,15 @@ export function SofiaChatPanel({ flow, onClose }: SofiaChatPanelProps) {
 
   return (
     <>
-      <SheetHeader className="border-b-0 bg-[var(--wa-header)] px-4 py-3">
+      <SheetHeader className="bg-foil border-b-0 px-4 py-3">
         <div className="flex items-center gap-3">
           <img
             src="/assets/sofia-avatar.jpg"
             alt="Sofia"
-            className="size-10 shrink-0 rounded-full object-cover"
+            className="size-11 shrink-0 rounded-full object-cover ring-2 ring-white/70"
           />
           <div>
-            <SheetTitle className="font-sans text-[var(--wa-header-foreground)]">Sofia</SheetTitle>
+            <SheetTitle className="font-display text-2xl font-semibold leading-none text-[var(--wa-header-foreground)]">Sofia</SheetTitle>
             <SheetDescription className="text-[var(--wa-header-foreground)]/80">
               Assistente virtual · {BRAND.nome}
             </SheetDescription>
@@ -53,7 +53,7 @@ export function SofiaChatPanel({ flow, onClose }: SofiaChatPanelProps) {
         </div>
         <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[var(--wa-track)]">
           <div
-            className="h-full rounded-full bg-[var(--wa-accent)] transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-white/90 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -62,7 +62,7 @@ export function SofiaChatPanel({ flow, onClose }: SofiaChatPanelProps) {
       {isConversationPhase && (
         <>
           <ChatTranscript messages={messages} botTyping={botTyping} />
-          <div className="border-t border-black/5 bg-[var(--wa-input-bar)] px-3 py-2.5 sm:px-4">
+          <div className="border-t border-border bg-[var(--wa-input-bar)] px-3 py-2.5 sm:px-4">
             {currentStep ? (
               <SofiaAnswerInput
                 step={currentStep}

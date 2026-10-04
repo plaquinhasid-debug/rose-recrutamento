@@ -15,7 +15,9 @@ export function ChatBubble({ message }: ChatBubbleProps) {
       <div
         className={cn(
           "max-w-[80%] rounded-lg px-3 py-2 text-sm leading-relaxed text-[var(--wa-bubble-text)] shadow-sm",
-          isBot ? "rounded-tl-none bg-[var(--wa-bubble-in)]" : "rounded-tr-none bg-[var(--wa-bubble-out)]",
+          isBot
+            ? "rounded-tl-none bg-[var(--wa-bubble-in)] ring-1 ring-[#ecd5cf]/70"
+            : "rounded-tr-none bg-[var(--wa-bubble-out)]",
         )}
       >
         {/* O horário precisa vir ANTES do texto no HTML — um `float` só

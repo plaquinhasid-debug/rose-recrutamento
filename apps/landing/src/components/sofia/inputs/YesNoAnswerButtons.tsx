@@ -12,7 +12,7 @@ export function YesNoAnswerButtons({ step, disabled, onAnswer }: YesNoAnswerButt
     <div className="flex w-full gap-3">
       <Button
         type="button"
-        className="flex-1 rounded-full bg-[var(--wa-accent)] text-[var(--wa-accent-foreground)] hover:bg-[var(--wa-accent)]/90"
+        className="bg-foil flex-1 rounded-full text-[var(--wa-accent-foreground)] hover:brightness-110"
         disabled={disabled}
         onClick={() => onAnswer(true, step.yesLabel)}
       >

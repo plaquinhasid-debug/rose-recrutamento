@@ -50,19 +50,19 @@
   --input: #ecd5cf;
   --ring: #b97a6d;
 
-  /* Chat da Sofia — paleta inspirada no WhatsApp, isolada do tema geral
-     (preto/dourado) do site. Usada só dentro de components/sofia/*. */
-  --wa-header: #075e54;
-  --wa-header-foreground: #ffffff;
-  --wa-chat-bg: #e5ddd5;
+  /* Chat da Sofia — mesmo jeito de conversa do WhatsApp (bolhas, chips),
+     vestido com a paleta da Rosé. Usada só dentro de components/sofia/*. */
+  --wa-header: #9c5c53; /* rose gold: chips e botões de resposta */
+  --wa-header-foreground: #fffaf8;
+  --wa-chat-bg: #fbf3f1; /* blush */
   --wa-bubble-in: #ffffff;
-  --wa-bubble-out: #d9fdd3;
-  --wa-bubble-text: #111b21;
-  --wa-timestamp: #667781;
-  --wa-accent: #25d366;
-  --wa-accent-foreground: #ffffff;
-  --wa-input-bar: #f0f0f0;
-  --wa-track: rgba(255, 255, 255, 0.3);
+  --wa-bubble-out: #f3dcd5; /* pétala */
+  --wa-bubble-text: #4a2c29;
+  --wa-timestamp: #9a7a74;
+  --wa-accent: #9c5c53;
+  --wa-accent-foreground: #fffaf8;
+  --wa-input-bar: #f5e4df;
+  --wa-track: rgba(255, 255, 255, 0.28);
 }
 
 .dark {
@@ -154,8 +154,11 @@
    mesmo espírito do fundo clássico do WhatsApp, sem depender de imagem. */
 .wa-wallpaper {
   background-color: var(--wa-chat-bg);
-  background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px);
-  background-size: 18px 18px;
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(227, 180, 164, 0.35), transparent 45%),
+    radial-gradient(rgba(156, 92, 83, 0.09) 1px, transparent 1px);
+  background-size: 100% 100%, 18px 18px;
+  background-attachment: local, local;
 }
 
 @keyframes accordion-down {

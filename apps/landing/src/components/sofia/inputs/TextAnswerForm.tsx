@@ -81,7 +81,7 @@ export function TextAnswerForm({
           disabled={disabled}
           aria-label="Enviar resposta"
           className={cn(
-            "rounded-full bg-[var(--wa-accent)] text-[var(--wa-accent-foreground)] hover:bg-[var(--wa-accent)]/90",
+            "bg-foil rounded-full text-[var(--wa-accent-foreground)] hover:brightness-110",
             multiline && "mb-0",
           )}
         >
