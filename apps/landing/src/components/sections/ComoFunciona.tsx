@@ -19,7 +19,7 @@ const STEPS = [
   {
     number: "03",
     title: "Retire sua maleta",
-    text: "Aprovada! Você vem até a loja, conhece a Carol e leva sua maleta com cerca de 50 peças em consignação — sem pagar nada antes.",
+    text: "Aprovada! Você vem até a loja, conhece a nossa equipe e leva sua maleta com cerca de 50 peças em consignação — sem pagar nada antes.",
   },
   {
     number: "04",
