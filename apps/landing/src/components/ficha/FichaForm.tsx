@@ -16,6 +16,12 @@ import { Label } from "@/components/ui/label"
 /** 10 MB por arquivo — foto de celular costuma ter 2 a 5 MB. */
 export const MAX_DOCUMENTO_BYTES = 10 * 1024 * 1024
 
+/**
+ * Rose: nesta etapa a ficha NÃO pede documentos. Pra voltar a pedir RG/CNH e
+ * comprovante, troque pra `true` (o servidor já aceita com ou sem).
+ */
+const PEDIR_DOCUMENTOS = false
+
 export type DocumentosSelecionados = Partial<Record<DocumentoTipo, File>>
 
 interface FichaFormProps {
@@ -76,7 +82,7 @@ export function FichaForm({ onSubmitValues }: FichaFormProps) {
 
   const onSubmit = handleSubmit(async (values) => {
     setSubmitError(null)
-    const faltando = DOCUMENTO_TIPOS.filter((tipo) => !documentos[tipo])
+    const faltando = PEDIR_DOCUMENTOS ? DOCUMENTO_TIPOS.filter((tipo) => !documentos[tipo]) : []
     if (faltando.length > 0) {
       setDocumentosErro(`Falta enviar: ${faltando.map((t) => DOCUMENTO_TIPO_LABEL[t]).join(", ")}.`)
       return
@@ -229,6 +235,7 @@ export function FichaForm({ onSubmitValues }: FichaFormProps) {
         ))}
       </div>
 
+      {PEDIR_DOCUMENTOS && (
       <div className="space-y-4">
         <h2 className="font-display text-lg font-semibold text-foreground">Documentos</h2>
         <p className="text-sm text-muted-foreground">
@@ -246,6 +253,7 @@ export function FichaForm({ onSubmitValues }: FichaFormProps) {
         ))}
         {documentosErro && <p className="text-xs text-destructive">{documentosErro}</p>}
       </div>
+      )}
 
       {submitError && <p className="text-sm text-destructive">{submitError}</p>}
 

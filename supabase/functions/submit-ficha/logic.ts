@@ -115,9 +115,8 @@ export function validarFicha(body: Record<string, unknown>, fichaId: string): Va
     }
     documentos.push({ tipo: tipo as DocumentoTipo, path })
   }
-  for (const tipo of DOCUMENTO_TIPOS) {
-    if (!documentos.some((d) => d.tipo === tipo)) return { ok: false, field: "documentos" }
-  }
+  // Rose: documentos são opcionais nesta etapa (o formulário não pede).
+  // Se vierem, continuam validados acima (tipo e caminho dentro da ficha).
 
   return {
     ok: true,
