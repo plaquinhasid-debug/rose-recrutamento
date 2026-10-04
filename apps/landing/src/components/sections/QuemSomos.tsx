@@ -37,7 +37,7 @@ const BENEFICIOS = [
   {
     icon: HeartHandshake,
     title: "Suporte da Carol",
-    text: "A Carol acompanha cada vendedora de perto. Aqui você não está sozinha.",
+    text: "Acompanhamos cada vendedora de perto. Aqui você não está sozinha.",
   },
 ]
 
