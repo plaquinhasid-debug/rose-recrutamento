@@ -1,5 +1,5 @@
 import { BRAND } from "@tania-joias/shared"
-import { Banknote, Check, Gem, GraduationCap, HeartHandshake, RefreshCw, Smartphone, Star } from "lucide-react"
+import { Banknote, Check, Gem, HeartHandshake, RefreshCw, Smartphone, Star, Users } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
 import { Button } from "@/components/ui/button"
@@ -20,9 +20,9 @@ const BENEFICIOS = [
     text: "Você vende por 30 dias e faz o acerto só do que vendeu. Sem comprar estoque antecipado.",
   },
   {
-    icon: GraduationCap,
-    title: "Treinamento Completo",
-    text: "Mesmo sem experiência, você aprende tudo o que precisa para começar a vender com confiança.",
+    icon: Users,
+    title: `Suporte da equipe ${BRAND.nome}`,
+    text: "Mesmo sem experiência, você conta com a nossa equipe para tirar dúvidas e começar a vender com confiança.",
   },
   {
     icon: Banknote,

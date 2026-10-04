@@ -25,8 +25,8 @@ export function Hero({ onOpenSofia }: HeroProps) {
           </p>
 
           <p className="mt-3 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Faça parte da equipe da {BRAND.nome}. Sem investimento inicial. Treinamento
-            completo. Suporte.
+            Faça parte da equipe da {BRAND.nome}. Sem investimento inicial e com suporte da
+            nossa equipe.
           </p>
 
           <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">

@@ -31,7 +31,7 @@ const FAQ_ITEMS = [
   {
     question: "Preciso ter experiência com vendas?",
     answer:
-      "Não é obrigatório. Damos treinamento completo para quem está começando agora. Ter experiência com vendas de roupas, cosméticos ou joias conta como diferencial, mas não é exigido.",
+      `Não é obrigatório. Quem está começando agora conta com o suporte da equipe ${BRAND.nome}. Ter experiência com vendas de roupas, cosméticos ou joias conta como diferencial, mas não é exigido.`,
   },
   {
     question: "Qual é a idade mínima para participar?",
