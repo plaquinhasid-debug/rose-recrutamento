@@ -221,21 +221,19 @@ export function BelezaPage() {
               </p>
             </div>
 
-            {/* Vitrine em arco, no mesmo estilo da landing geral */}
+            {/* Foto retangular com o expositor inteiro (frame do vídeo do anúncio) */}
             <div
               style={{ animationDelay: "0.12s" }}
-              className="rise-in relative mx-auto w-full max-w-[19rem] pt-10 sm:max-w-sm lg:max-w-[26rem]"
+              className="rise-in relative mx-auto w-full max-w-[19rem] sm:max-w-sm lg:max-w-[26rem]"
             >
-              <CrownMark className="absolute left-1/2 top-0 z-10 h-11 w-auto -translate-x-1/2 text-primary/80" />
-              <div className="absolute inset-x-0 bottom-0 top-10 translate-x-3 translate-y-3 rounded-t-full border border-champagne" />
-              <div className="relative aspect-[4/5] overflow-hidden rounded-t-full bg-secondary shadow-[0_30px_60px_-25px_rgba(90,48,44,0.45)]">
-                {/* Frame do vídeo do anúncio: o expositor com as peças */}
+              <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-lg border border-champagne" />
+              <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-secondary shadow-[0_30px_60px_-25px_rgba(90,48,44,0.45)]">
                 <img
                   src="/assets/beleza-expositor.webp"
-                  width={595}
-                  height={744}
+                  width={690}
+                  height={920}
                   alt="Expositor giratório da Rosé com colares e brincos em consignação"
-                  className="size-full object-cover object-top"
+                  className="size-full object-cover"
                   fetchPriority="high"
                 />
               </div>
