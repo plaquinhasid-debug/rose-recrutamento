@@ -221,7 +221,7 @@ export function BelezaPage() {
               </p>
             </div>
 
-            {/* Vitrine em arco, igual à landing geral */}
+            {/* Vitrine em arco, no mesmo estilo da landing geral */}
             <div
               style={{ animationDelay: "0.12s" }}
               className="rise-in relative mx-auto w-full max-w-[19rem] pt-10 sm:max-w-sm lg:max-w-[26rem]"
@@ -229,14 +229,13 @@ export function BelezaPage() {
               <CrownMark className="absolute left-1/2 top-0 z-10 h-11 w-auto -translate-x-1/2 text-primary/80" />
               <div className="absolute inset-x-0 bottom-0 top-10 translate-x-3 translate-y-3 rounded-t-full border border-champagne" />
               <div className="relative aspect-[4/5] overflow-hidden rounded-t-full bg-secondary shadow-[0_30px_60px_-25px_rgba(90,48,44,0.45)]">
+                {/* Frame do vídeo do anúncio: o expositor com as peças */}
                 <img
-                  src="/assets/rose-banner.webp"
-                  srcSet="/assets/rose-banner-600.webp 600w, /assets/rose-banner.webp 1110w"
-                  sizes="(min-width: 1024px) 26rem, (min-width: 640px) 24rem, 19rem"
-                  width={1110}
-                  height={745}
-                  alt="Semijoias da Rose: colar, bracelete e anel sobre mármore e cetim rosa"
-                  className="size-full object-cover object-[50%_40%]"
+                  src="/assets/beleza-expositor.webp"
+                  width={595}
+                  height={744}
+                  alt="Expositor giratório da Rosé com colares e brincos em consignação"
+                  className="size-full object-cover object-top"
                   fetchPriority="high"
                 />
               </div>
