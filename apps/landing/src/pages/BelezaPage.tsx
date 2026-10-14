@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react"
 import { BRAND } from "@tania-joias/shared"
-import { BadgePercent, Gem, Store, Users } from "lucide-react"
+import { BadgePercent, Gem, MapPin, Store, Users } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
 import { CrownMark } from "@/components/sections/CrownMark"
@@ -185,11 +185,13 @@ export function BelezaPage() {
 
           <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pb-16 pt-10 sm:pb-24 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:py-20">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent-foreground">
+              {/* Mesma pergunta que abre o vídeo do anúncio — em destaque */}
+              <p className="inline-flex items-center gap-2.5 rounded-2xl bg-primary px-5 py-3 text-lg font-semibold leading-snug text-primary-foreground shadow-lg shadow-primary/25 sm:text-xl">
+                <MapPin className="size-5 shrink-0 sm:size-6" aria-hidden />
                 Você é de Mauá e região e tem um salão ou estética?
               </p>
 
-              <h1 className="mt-5 font-display text-[2.6rem] font-medium leading-[1.04] tracking-[-0.01em] text-foreground sm:text-6xl lg:text-[4rem]">
+              <h1 className="mt-7 font-display text-[2.6rem] font-medium leading-[1.04] tracking-[-0.01em] text-foreground sm:text-6xl lg:text-[4rem]">
                 Suas clientes adoram se cuidar.{" "}
                 <em className="text-primary">Ofereça Rosé.</em>
               </h1>
