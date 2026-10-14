@@ -43,6 +43,23 @@ export const SOFIA_APPROVED_LINES = [
   "Depois disso, é só combinar a retirada da sua maleta! 💼",
 ] as const
 
+// Variante da landing `/beleza` (campanha Meta para salões e estéticas):
+// mesmo roteiro de perguntas e mesma pontuação, só muda a fala de abertura e
+// a de aprovação — lá a parceira recebe um expositor no balcão, não a maleta.
+export const SOFIA_BELEZA_INTRO_LINES = [
+  "Olá 🌸",
+  `Sou a ${BRAND.assistente}, assistente virtual da ${BRAND.nome}.`,
+  "Que bom que você quer levar a Rosé para as suas clientes! Vou te fazer algumas perguntas rápidas pra conhecer você e o seu espaço — sem compromisso.",
+  "Leva menos de 2 minutos.",
+] as const
+
+export const SOFIA_BELEZA_APPROVED_LINES = [
+  "Parabéns! 🌸",
+  "Você concluiu a primeira etapa e está pré-aprovada!",
+  "Em breve nossa equipe vai te chamar no WhatsApp com o link da segunda parte do cadastro — é rápido.",
+  "Depois disso, é só combinar a entrega do seu expositor! ✨",
+] as const
+
 export const SOFIA_EM_ANALISE_LINES = [
   "Muito obrigada por compartilhar tudo isso com a gente!",
   "Sua candidatura já está em análise pela nossa equipe.",

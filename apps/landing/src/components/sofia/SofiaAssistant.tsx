@@ -11,6 +11,13 @@ import { hasLoggedOnce, markLoggedOnce } from "@/lib/tracking"
 interface SofiaAssistantProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /**
+   * Origem gravada no lead quando a landing é específica de uma campanha
+   * (ex.: "beleza"). Sem ela, vale o `utm_source` ou "landing_page".
+   */
+  origem?: string
+  introLines?: readonly string[]
+  approvedLines?: readonly string[]
 }
 
 /**
@@ -18,14 +25,21 @@ interface SofiaAssistantProps {
  * quando o drawer é fechado e reaberto (não perde progresso), e cuida do
  * rastreamento de `chat_iniciado` / `conversations` / `chat_abandonado`.
  */
-export function SofiaAssistant({ open, onOpenChange }: SofiaAssistantProps) {
+export function SofiaAssistant({
+  open,
+  onOpenChange,
+  origem,
+  introLines,
+  approvedLines,
+}: SofiaAssistantProps) {
   const sessionId = useSessionId()
   const utm = useUtmParams()
   const flow = useSofiaFlow({
     sessionId,
     utm,
-    origem: utm.utm_source ?? "landing_page",
+    origem: origem ?? utm.utm_source ?? "landing_page",
     campanha: utm.utm_campaign,
+    introLines,
   })
 
   const conversationStarted = useRef(false)
@@ -85,7 +99,11 @@ export function SofiaAssistant({ open, onOpenChange }: SofiaAssistantProps) {
         className="gap-0 p-0"
         closeClassName="top-4 text-white/90 hover:bg-white/15 hover:text-white"
       >
-        <SofiaChatPanel flow={flow} onClose={() => onOpenChange(false)} />
+        <SofiaChatPanel
+          flow={flow}
+          onClose={() => onOpenChange(false)}
+          approvedLines={approvedLines}
+        />
       </SheetContent>
     </Sheet>
   )

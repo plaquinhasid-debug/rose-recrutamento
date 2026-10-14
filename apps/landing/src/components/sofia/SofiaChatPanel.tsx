@@ -11,9 +11,10 @@ import type { SofiaFlow } from "@/hooks/useSofiaFlow"
 interface SofiaChatPanelProps {
   flow: SofiaFlow
   onClose: () => void
+  approvedLines?: readonly string[]
 }
 
-export function SofiaChatPanel({ flow, onClose }: SofiaChatPanelProps) {
+export function SofiaChatPanel({ flow, onClose, approvedLines }: SofiaChatPanelProps) {
   const {
     phase,
     messages,
@@ -83,7 +84,12 @@ export function SofiaChatPanel({ flow, onClose }: SofiaChatPanelProps) {
       )}
 
       {phase === "result" && result && (
-        <ResultScreen result={result} trabalha={answers.trabalha} onClose={onClose} />
+        <ResultScreen
+          result={result}
+          trabalha={answers.trabalha}
+          onClose={onClose}
+          approvedLines={approvedLines}
+        />
       )}
     </>
   )

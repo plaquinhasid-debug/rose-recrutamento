@@ -57,6 +57,8 @@ interface UseSofiaFlowParams {
   utm: UtmParams
   origem?: string
   campanha?: string
+  /** Fala de abertura; padrão é `SOFIA_INTRO_LINES`. */
+  introLines?: readonly string[]
 }
 
 export interface SofiaFlow {
@@ -73,7 +75,13 @@ export interface SofiaFlow {
   retrySubmit: () => void
 }
 
-export function useSofiaFlow({ sessionId, utm, origem, campanha }: UseSofiaFlowParams): SofiaFlow {
+export function useSofiaFlow({
+  sessionId,
+  utm,
+  origem,
+  campanha,
+  introLines = SOFIA_INTRO_LINES,
+}: UseSofiaFlowParams): SofiaFlow {
   const [phase, setPhase] = useState<SofiaPhase>("intro")
   const [messages, setMessages] = useState<SofiaMessage[]>([])
   const [stepIndex, setStepIndex] = useState<number>(0)
@@ -255,13 +263,13 @@ export function useSofiaFlow({ sessionId, utm, origem, campanha }: UseSofiaFlowP
     if (introStarted.current) return
     introStarted.current = true
     void (async () => {
-      await pushBotLine(SOFIA_INTRO_LINES.join("\n\n"), INTRO_LINE_DELAY_MS)
+      await pushBotLine(introLines.join("\n\n"), INTRO_LINE_DELAY_MS)
       const first = findNextStepIndex(0, {})
       setStepIndex(first)
       setPhase("asking")
       await pushBotLine(SOFIA_STEPS[first].question, 400)
     })()
-  }, [pushBotLine])
+  }, [pushBotLine, introLines])
 
   const retrySubmit = useCallback(() => {
     void runSubmission(answers)

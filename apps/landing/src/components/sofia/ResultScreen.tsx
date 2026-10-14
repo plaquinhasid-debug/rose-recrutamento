@@ -19,9 +19,16 @@ interface ResultScreenProps {
   result: FinalizeCandidateResponse
   trabalha: boolean | undefined
   onClose: () => void
+  /** Fala de aprovação; padrão é `SOFIA_APPROVED_LINES`. */
+  approvedLines?: readonly string[]
 }
 
-export function ResultScreen({ result, trabalha, onClose }: ResultScreenProps) {
+export function ResultScreen({
+  result,
+  trabalha,
+  onClose,
+  approvedLines = SOFIA_APPROVED_LINES,
+}: ResultScreenProps) {
   const [revealed, setRevealed] = useState(false)
 
   // Quando reprovada por não estar trabalhando, reaproveita a mensagem de
@@ -30,7 +37,7 @@ export function ResultScreen({ result, trabalha, onClose }: ResultScreenProps) {
 
   const lines =
     result.status === "aprovada"
-      ? SOFIA_APPROVED_LINES
+      ? approvedLines
       : result.status === "em_analise"
         ? SOFIA_EM_ANALISE_LINES
         : isReprovadaPorNaoTrabalhar

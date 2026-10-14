@@ -24,6 +24,8 @@ const FichaPage = lazy(() => import("@/pages/FichaPage").then((m) => ({ default:
 const PrivacyPolicy = lazy(() =>
   import("@/pages/PrivacyPolicy").then((m) => ({ default: m.PrivacyPolicy })),
 )
+// Landing da campanha Meta para profissionais da beleza (salões/estéticas).
+const BelezaPage = lazy(() => import("@/pages/BelezaPage").then((m) => ({ default: m.BelezaPage })))
 
 function prefetchSofia() {
   const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500))
@@ -81,6 +83,14 @@ function App() {
     return (
       <Suspense fallback={null}>
         <PrivacyPolicy />
+      </Suspense>
+    )
+  }
+
+  if (/^\/beleza\/?$/.test(window.location.pathname)) {
+    return (
+      <Suspense fallback={null}>
+        <BelezaPage />
       </Suspense>
     )
   }
