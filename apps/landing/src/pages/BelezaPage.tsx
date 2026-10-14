@@ -20,8 +20,8 @@ import { useUtmParams } from "@/hooks/useUtmParams"
 /**
  * Landing `/beleza` — destino da campanha Meta para profissionais da beleza
  * (salões, estéticas, manicures, lojas) de Mauá e região. Fala a mesma
- * língua do vídeo do anúncio (`public/assets/beleza-video.mp4`): expositor
- * de semijoias no balcão, totalmente consignado, até 40% de comissão.
+ * língua do vídeo do anúncio (o vídeo fica só no criativo): expositor de
+ * semijoias no balcão, totalmente consignado, até 40% de comissão.
  *
  * O cadastro é a mesma Sofia da landing geral (mesmo funil, IPR e CRM); o
  * lead entra com `origem = "beleza"` para ser filtrado no painel.
@@ -219,22 +219,23 @@ export function BelezaPage() {
               </p>
             </div>
 
-            {/* O vídeo do anúncio, num "celular" — quem clicou reconhece na hora */}
+            {/* Vitrine em arco, igual à landing geral */}
             <div
               style={{ animationDelay: "0.12s" }}
-              className="rise-in relative mx-auto w-full max-w-[17rem] pt-10 sm:max-w-[19rem]"
+              className="rise-in relative mx-auto w-full max-w-[19rem] pt-10 sm:max-w-sm lg:max-w-[26rem]"
             >
               <CrownMark className="absolute left-1/2 top-0 z-10 h-11 w-auto -translate-x-1/2 text-primary/80" />
-              <div className="absolute inset-x-0 bottom-0 top-10 translate-x-3 translate-y-3 rounded-[2rem] border border-champagne" />
-              <div className="relative overflow-hidden rounded-[2rem] border-[6px] border-card bg-wine shadow-[0_30px_60px_-25px_rgba(90,48,44,0.45)]">
-                <video
-                  className="block aspect-[9/16] w-full object-cover"
-                  src="/assets/beleza-video.mp4"
-                  poster="/assets/beleza-poster.webp"
-                  controls
-                  playsInline
-                  preload="none"
-                  aria-label="Vídeo: expositor de semijoias Rosé para salões"
+              <div className="absolute inset-x-0 bottom-0 top-10 translate-x-3 translate-y-3 rounded-t-full border border-champagne" />
+              <div className="relative aspect-[4/5] overflow-hidden rounded-t-full bg-secondary shadow-[0_30px_60px_-25px_rgba(90,48,44,0.45)]">
+                <img
+                  src="/assets/rose-banner.webp"
+                  srcSet="/assets/rose-banner-600.webp 600w, /assets/rose-banner.webp 1110w"
+                  sizes="(min-width: 1024px) 26rem, (min-width: 640px) 24rem, 19rem"
+                  width={1110}
+                  height={745}
+                  alt="Semijoias da Rose: colar, bracelete e anel sobre mármore e cetim rosa"
+                  className="size-full object-cover object-[50%_40%]"
+                  fetchPriority="high"
                 />
               </div>
             </div>
